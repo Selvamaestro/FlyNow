@@ -1295,3 +1295,52 @@
   color: #3C3325;
   border-color: #F4B000;
 }
+
+/* Actions Dropdown */
+.company-action-dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.company-action-dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 6px;
+  background-color: #FFFDF9;
+  border: 1px solid #EFE6D9;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(92, 67, 8, 0.08);
+  z-index: 110;
+  min-width: 100px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.company-action-dropdown-item {
+  background: transparent;
+  border: none;
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6C5F4C;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.company-action-dropdown-item:hover {
+  background-color: #FFF5EA;
+  color: #5C4308;
+}
+
+.company-action-dropdown-item.delete {
+  color: #E11D48;
+}
+
+.company-action-dropdown-item.delete:hover {
+  background-color: #FEE2E2;
+  color: #E11D48;
+}

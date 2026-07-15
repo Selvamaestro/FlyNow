@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./CompanyDashboard.css";
 import {
@@ -31,6 +31,10 @@ const CompanyDashboard = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [graphMode, setGraphMode] = useState("Week");
 
+  // Actions menu state
+  const [activeActionMenuId, setActiveActionMenuId] = useState(null);
+  const [editingFlyerId, setEditingFlyerId] = useState(null);
+
   // Form states - empty by default
   const [companyName, setCompanyName] = useState("");
   const [category, setCategory] = useState("");
@@ -43,6 +47,10 @@ const CompanyDashboard = () => {
     {
       id: 1,
       name: "Early Bird Coffee 20%",
+      companyName: "Coffee House",
+      category: "Food",
+      promoCode: "COFFEE20",
+      expiryDate: "Aug 31",
       started: "Started 3 days ago",
       reach: "12,402",
       redemptions: "842",
@@ -52,6 +60,10 @@ const CompanyDashboard = () => {
     {
       id: 2,
       name: "Luxury Accessories Flash",
+      companyName: "Gold & Co",
+      category: "Fashion",
+      promoCode: "LUXURY15",
+      expiryDate: "Jul 15",
       started: "Ended 2 hours ago",
       reach: "45,120",
       redemptions: "2,109",
@@ -61,6 +73,10 @@ const CompanyDashboard = () => {
     {
       id: 3,
       name: "Weekend Market Specials",
+      companyName: "Supermarket Inc",
+      category: "Grocery",
+      promoCode: "MARKETWEEK",
+      expiryDate: "Jul 20",
       started: "Started 1 day ago",
       reach: "8,230",
       redemptions: "312",
@@ -68,6 +84,15 @@ const CompanyDashboard = () => {
       image: "/market_flyer.png"
     }
   ]);
+
+  // Click outside to close actions menu
+  useEffect(() => {
+    const handleOutsideClick = () => {
+      setActiveActionMenuId(null);
+    };
+    window.addEventListener("click", handleOutsideClick);
+    return () => window.removeEventListener("click", handleOutsideClick);
+  }, []);
 
   const sidebarMenu = [
     { name: "Dashboard", icon: <LayoutDashboard size={20} /> },
@@ -82,9 +107,18 @@ const CompanyDashboard = () => {
     setActiveMenu(menuName);
     if (menuName === "Dashboard") {
       setView("dashboard");
+      setEditingFlyerId(null);
     } else if (menuName === "My Flyers") {
       setView("create-flyer");
       setCurrentStep(1);
+      setEditingFlyerId(null);
+      // Reset fields
+      setCompanyName("");
+      setCategory("");
+      setCampaignTitle("");
+      setPromoCode("");
+      setExpiryDate("");
+      setFlyerImage("");
     }
   };
 
@@ -137,20 +171,46 @@ const CompanyDashboard = () => {
 
   const handlePublish = () => {
     if (!companyName.trim() || !category || !flyerImage || !campaignTitle.trim() || !promoCode.trim() || !expiryDate.trim()) {
-      alert("Please ensure all fields in all steps are completely filled before publishing.");
+      alert("Please ensure all fields in all steps are completely filled.");
       return;
     }
 
-    const newFlyer = {
-      id: Date.now(),
-      name: campaignTitle,
-      started: "Started just now",
-      reach: "0",
-      redemptions: "0",
-      status: "Active",
-      image: flyerImage
-    };
-    setFlyersList([newFlyer, ...flyersList]);
+    if (editingFlyerId) {
+      // Edit existing flyer
+      setFlyersList(
+        flyersList.map((f) =>
+          f.id === editingFlyerId
+            ? {
+                ...f,
+                name: campaignTitle,
+                companyName: companyName,
+                category: category,
+                promoCode: promoCode,
+                expiryDate: expiryDate,
+                image: flyerImage
+              }
+            : f
+        )
+      );
+      setEditingFlyerId(null);
+    } else {
+      // Create new flyer
+      const newFlyer = {
+        id: Date.now(),
+        name: campaignTitle,
+        companyName: companyName,
+        category: category,
+        promoCode: promoCode,
+        expiryDate: expiryDate,
+        image: flyerImage,
+        started: "Started just now",
+        reach: "0",
+        redemptions: "0",
+        status: "Active"
+      };
+      setFlyersList([newFlyer, ...flyersList]);
+    }
+
     setView("dashboard");
     setActiveMenu("Dashboard");
     setCurrentStep(1);
@@ -162,6 +222,34 @@ const CompanyDashboard = () => {
     setPromoCode("");
     setExpiryDate("");
     setFlyerImage("");
+  };
+
+  const handleEditClick = (e, flyer) => {
+    e.stopPropagation();
+    setEditingFlyerId(flyer.id);
+    setCompanyName(flyer.companyName || "");
+    setCategory(flyer.category || "");
+    setCampaignTitle(flyer.name || "");
+    setPromoCode(flyer.promoCode || "");
+    setExpiryDate(flyer.expiryDate || "");
+    setFlyerImage(flyer.image || "");
+
+    setView("create-flyer");
+    setCurrentStep(1);
+    setActiveActionMenuId(null);
+  };
+
+  const handleDeleteClick = (e, id) => {
+    e.stopPropagation();
+    if (window.confirm("Are you sure you want to delete this flyer campaign?")) {
+      setFlyersList(flyersList.filter((f) => f.id !== id));
+      setActiveActionMenuId(null);
+    }
+  };
+
+  const toggleActionMenu = (e, id) => {
+    e.stopPropagation();
+    setActiveActionMenuId(activeActionMenuId === id ? null : id);
   };
 
   return (
@@ -201,7 +289,7 @@ const CompanyDashboard = () => {
         <header className="company-header">
           <div className="company-header-left">
             <h1 className="company-title">
-              {view === "create-flyer" ? "Create Flyer" : "Overview"}
+              {view === "create-flyer" ? (editingFlyerId ? "Edit Flyer" : "Create Flyer") : "Overview"}
             </h1>
             {view === "dashboard" && (
               <div className="company-location-pill">
@@ -426,9 +514,30 @@ const CompanyDashboard = () => {
                           </span>
                         </td>
                         <td>
-                          <button className="company-action-menu-btn">
-                            <MoreHorizontal size={18} />
-                          </button>
+                          <div className="company-action-dropdown-wrapper">
+                            <button
+                              className="company-action-menu-btn"
+                              onClick={(e) => toggleActionMenu(e, flyer.id)}
+                            >
+                              <MoreHorizontal size={18} />
+                            </button>
+                            {activeActionMenuId === flyer.id && (
+                              <div className="company-action-dropdown-menu">
+                                <button
+                                  className="company-action-dropdown-item"
+                                  onClick={(e) => handleEditClick(e, flyer)}
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  className="company-action-dropdown-item delete"
+                                  onClick={(e) => handleDeleteClick(e, flyer.id)}
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -438,12 +547,12 @@ const CompanyDashboard = () => {
             </section>
           </>
         ) : (
-          /* Create Flyer Wizard */
+          /* Create / Edit Flyer Wizard */
           <div className="company-wizard-container">
             {/* Left Steps Panel */}
             <div className="company-wizard-sidebar">
               <div className="company-wizard-sidebar-header">
-                <h2>Create Flyer</h2>
+                <h2>{editingFlyerId ? "Edit Flyer" : "Create Flyer"}</h2>
                 <p>Design a premium offer that stands out. Our savvy shoppers value high-quality visuals and clear benefits.</p>
               </div>
 
@@ -658,7 +767,7 @@ const CompanyDashboard = () => {
                   </button>
                 ) : (
                   <button className="company-wizard-publish" onClick={handlePublish}>
-                    <span>Publish Flyer</span>
+                    <span>{editingFlyerId ? "Save Changes" : "Publish Flyer"}</span>
                     <Sparkles size={16} />
                   </button>
                 )}
