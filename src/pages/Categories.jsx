@@ -116,7 +116,7 @@ const Categories = () => {
                   </div>
 
                   <div className="card-action-row">
-                    <Link to={`/`} className="category-explore-link">
+                    <Link to={`/category/${category.icon}`} className="category-explore-link">
                       <span>{category.exploreText}</span>
                       <ArrowRight size={16} className="explore-arrow" />
                     </Link>
