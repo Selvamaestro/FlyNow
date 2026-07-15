@@ -1,0 +1,117 @@
+.categories-section{
+    margin-top:60px;
+}
+
+.section-heading{
+    margin-bottom:35px;
+}
+
+.section-heading h2{
+    font-size:40px;
+    font-weight:700;
+    color:#1E1E1E;
+}
+
+.section-heading p{
+    color:#777;
+    margin-top:10px;
+    font-size:18px;
+}
+
+.categories-grid{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:30px;
+}
+
+.category-card{
+
+    background:#fff;
+
+    border-radius:30px;
+
+    padding:40px 25px;
+
+    text-align:center;
+
+    box-shadow:0 12px 35px rgba(0,0,0,.08);
+
+    transition:.35s;
+
+    cursor:pointer;
+
+    position:relative;
+
+}
+
+.category-card:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:0 22px 45px rgba(0,0,0,.12);
+
+}
+
+.category-card::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:24px;
+
+    right:24px;
+
+    width:12px;
+
+    height:12px;
+
+    border-radius:50%;
+
+    background:#FFD166;
+
+    box-shadow:
+    -35px 25px #7DD3FC,
+    -15px 55px #9B8CFF;
+
+}
+
+.category-icon{
+
+    width:130px;
+
+    height:130px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    margin:0 auto 35px;
+
+    box-shadow:0 20px 40px rgba(0,0,0,.15);
+
+}
+
+.category-card h3{
+
+    font-size:28px;
+
+    font-weight:700;
+
+    color:#222;
+
+    margin-bottom:15px;
+
+}
+
+.offer-count{
+
+    font-size:20px;
+
+    color:#666;
+
+}
