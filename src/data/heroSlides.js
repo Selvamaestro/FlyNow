@@ -5,8 +5,8 @@ const heroSlides = [
     subtitle: "Discover Flyers, Coupons & Flash Sales",
     description:
       "Explore thousands of verified offers from your favourite brands and save more on every purchase.",
-    button: "Explore Offers",
-    image: "/hero/shopping.png",
+    button: "Shop Now",
+    image: "/hero_woman.png",
     badge: "🔥 Today's Hot Deals",
     stats: {
       offers: "12K+",

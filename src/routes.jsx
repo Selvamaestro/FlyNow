@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 
 import Home from "./pages/Home";
+import CompanyDashboard from "./pages/CompanyDashboard";
 
 import Admin from "./pages/admin/Admin";
 import CategoryManagement from "./pages/admin/CategoryManagement";
@@ -54,7 +55,14 @@ const AppRoutes = () => {
         path="/admin/settings"
         element={<SettingsPage />}
       />
-
+      <Route
+        path="/company"
+        element={<CompanyDashboard />}
+      />
+      <Route
+        path="/company/dashboard"
+        element={<CompanyDashboard />}
+      />
     </Routes>
 
   );
