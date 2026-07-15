@@ -1,28 +1,27 @@
-import "./Category.css";
 import {
   House,
   Laptop,
-  Baby,
   Shirt,
-  Footprints,
-  CookingPot,
+  Dumbbell,
+  Plane,
+  Utensils,
+  Car,
+  Tv,
+  GraduationCap,
   Sparkles,
-  ShoppingCart,
-  Trophy,
-  Sofa,
 } from "lucide-react";
 
 const categoryStyleMap = {
-  home: { bg: "#FEF2F2", color: "#B91C1C", iconBg: "#FEE2E2" },
-  electronics: { bg: "#EFF6FF", color: "#1E40AF", iconBg: "#DBEAFE" },
-  baby: { bg: "#FDF2F8", color: "#9D174D", iconBg: "#FCE7F3" },
-  fashion: { bg: "#F5F3FF", color: "#5B21B6", iconBg: "#EDE9FE" },
-  footwear: { bg: "#ECFDF5", color: "#047857", iconBg: "#D1FAE5" },
-  cookware: { bg: "#FFFBEB", color: "#B45309", iconBg: "#FEF3C7" },
-  skincare: { bg: "#F0FDF4", color: "#15803D", iconBg: "#DCFCE7" },
-  grocery: { bg: "#F0FDF4", color: "#15803D", iconBg: "#DCFCE7" },
-  sports: { bg: "#FEF2F2", color: "#B91C1C", iconBg: "#FEE2E2" },
-  furniture: { bg: "#FEF3C7", color: "#B45309", iconBg: "#FEF3C7" },
+  home: { bg: "#FDF2F8", color: "#EC4899", iconBg: "#FCE7F3" },
+  electronics: { bg: "#EFF6FF", color: "#2563EB", iconBg: "#DBEAFE" },
+  fashion: { bg: "#F5F3FF", color: "#7C3AED", iconBg: "#EDE9FE" },
+  wellness: { bg: "#ECFDF5", color: "#10B981", iconBg: "#D1FAE5" },
+  travel: { bg: "#FFFBEB", color: "#F59E0B", iconBg: "#FEF3C7" },
+  dining: { bg: "#FEF2F2", color: "#EF4444", iconBg: "#FEE2E2" },
+  automotive: { bg: "#F9FAFB", color: "#4B5563", iconBg: "#F3F4F6" },
+  entertainment: { bg: "#FDF2F8", color: "#DB2777", iconBg: "#FCE7F3" },
+  learning: { bg: "#ECFEFF", color: "#06B6D4", iconBg: "#CFFAFE" },
+  beauty: { bg: "#FFF5F5", color: "#EC4899", iconBg: "#FFE4E6" },
 };
 
 const CategoryCard = ({ category }) => {
@@ -31,21 +30,15 @@ const CategoryCard = ({ category }) => {
   const iconMap = {
     home: <House size={20} color={styles.color} />,
     electronics: <Laptop size={20} color={styles.color} />,
-    baby: <Baby size={20} color={styles.color} />,
     fashion: <Shirt size={20} color={styles.color} />,
-    footwear: <Footprints size={20} color={styles.color} />,
-    cookware: <CookingPot size={20} color={styles.color} />,
-    skincare: <Sparkles size={20} color={styles.color} />,
-    grocery: <ShoppingCart size={20} color={styles.color} />,
-    sports: <Trophy size={20} color={styles.color} />,
-    furniture: <Sofa size={20} color={styles.color} />,
+    wellness: <Dumbbell size={20} color={styles.color} />,
+    travel: <Plane size={20} color={styles.color} />,
+    dining: <Utensils size={20} color={styles.color} />,
+    automotive: <Car size={20} color={styles.color} />,
+    entertainment: <Tv size={20} color={styles.color} />,
+    learning: <GraduationCap size={20} color={styles.color} />,
+    beauty: <Sparkles size={20} color={styles.color} />,
   };
-
-  const displayName = category.title === "Home Products" 
-    ? "Home" 
-    : category.title === "Baby Products" 
-      ? "Baby" 
-      : category.title;
 
   return (
     <div 
@@ -62,7 +55,7 @@ const CategoryCard = ({ category }) => {
         className="category-pill-title"
         style={{ color: styles.color }}
       >
-        {displayName}
+        {category.title}
       </span>
     </div>
   );

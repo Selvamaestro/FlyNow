@@ -18,7 +18,7 @@ const Sidebar = () => {
 
   const menu = [
     { icon: <Home size={20} />, title: "Home", path: "/" },
-    { icon: <LayoutGrid size={20} />, title: "Categories", path: "/" },
+    { icon: <LayoutGrid size={20} />, title: "Categories", path: "/categories" },
     { icon: <Tag size={20} />, title: "Offers", path: "/" },
     { icon: <Zap size={20} />, title: "Flash Sales", path: "/" },
     { icon: <Wallet size={20} />, title: "Coupon Wallet", path: "/" },
