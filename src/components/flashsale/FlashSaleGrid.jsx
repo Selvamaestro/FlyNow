@@ -10,14 +10,8 @@ const FlashSaleGrid = () => {
     const loadFlashSales = () => {
       let allSaved = localStorage.getItem("flynow_all_flash_sales");
       if (!allSaved) {
-        // Seed default flash sales with a 48 hour duration
-        const seededList = flashSalesData.map((item) => ({
-          ...item,
-          expiresAt: Date.now() + 48 * 60 * 60 * 1000,
-          companyEmail: "demo@flynow.com"
-        }));
-        localStorage.setItem("flynow_all_flash_sales", JSON.stringify(seededList));
-        allSaved = JSON.stringify(seededList);
+        localStorage.setItem("flynow_all_flash_sales", JSON.stringify([]));
+        allSaved = JSON.stringify([]);
       }
 
       let list = JSON.parse(allSaved);
