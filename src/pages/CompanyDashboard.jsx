@@ -34,6 +34,7 @@ const CompanyDashboard = () => {
   // Actions menu state
   const [activeActionMenuId, setActiveActionMenuId] = useState(null);
   const [editingFlyerId, setEditingFlyerId] = useState(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
   // Form states - empty by default
   const [companyName, setCompanyName] = useState("");
@@ -50,11 +51,10 @@ const CompanyDashboard = () => {
       companyName: "Coffee House",
       category: "Food",
       promoCode: "COFFEE20",
-      expiryDate: "Aug 31",
+      expiryDate: "2026-08-31",
       started: "Started 3 days ago",
       reach: "12,402",
       redemptions: "842",
-      status: "Active",
       image: "/coffee_flyer.png"
     },
     {
@@ -63,11 +63,10 @@ const CompanyDashboard = () => {
       companyName: "Gold & Co",
       category: "Fashion",
       promoCode: "LUXURY15",
-      expiryDate: "Jul 15",
+      expiryDate: "2026-07-10",
       started: "Ended 2 hours ago",
       reach: "45,120",
       redemptions: "2,109",
-      status: "Expired",
       image: "/accessories_flyer.png"
     },
     {
@@ -76,23 +75,39 @@ const CompanyDashboard = () => {
       companyName: "Supermarket Inc",
       category: "Grocery",
       promoCode: "MARKETWEEK",
-      expiryDate: "Jul 20",
+      expiryDate: "2026-07-20",
       started: "Started 1 day ago",
       reach: "8,230",
       redemptions: "312",
-      status: "Active",
       image: "/market_flyer.png"
     }
   ]);
 
-  // Click outside to close actions menu
+  // Sync delete confirmation state with active menu
   useEffect(() => {
-    const handleOutsideClick = () => {
-      setActiveActionMenuId(null);
-    };
-    window.addEventListener("click", handleOutsideClick);
-    return () => window.removeEventListener("click", handleOutsideClick);
-  }, []);
+    if (activeActionMenuId === null) {
+      setDeleteConfirmId(null);
+    }
+  }, [activeActionMenuId]);
+
+  // Helper: Format YYYY-MM-DD to "MMM DD"
+  const formatExpiryDate = (dateStr) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr + "T00:00:00");
+    if (isNaN(date)) return dateStr;
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  };
+
+  // Helper: Calculate if flyer is expired relative to current date (July 15, 2026)
+  const getFlyerStatus = (expiryDateStr) => {
+    if (!expiryDateStr) return "Active";
+    // Set reference today as 2026-07-15
+    const today = new Date("2026-07-15T00:00:00");
+    today.setHours(0, 0, 0, 0);
+    const expiry = new Date(expiryDateStr + "T00:00:00");
+    expiry.setHours(0, 0, 0, 0);
+    return expiry < today ? "Expired" : "Active";
+  };
 
   const sidebarMenu = [
     { name: "Dashboard", icon: <LayoutDashboard size={20} /> },
@@ -162,7 +177,7 @@ const CompanyDashboard = () => {
         return;
       }
       if (!expiryDate.trim()) {
-        alert("Please enter an Expiration Date.");
+        alert("Please select an Expiration Date.");
         return;
       }
       setCurrentStep(3);
@@ -205,8 +220,7 @@ const CompanyDashboard = () => {
         image: flyerImage,
         started: "Started just now",
         reach: "0",
-        redemptions: "0",
-        status: "Active"
+        redemptions: "0"
       };
       setFlyersList([newFlyer, ...flyersList]);
     }
@@ -241,10 +255,9 @@ const CompanyDashboard = () => {
 
   const handleDeleteClick = (e, id) => {
     e.stopPropagation();
-    if (window.confirm("Are you sure you want to delete this flyer campaign?")) {
-      setFlyersList(flyersList.filter((f) => f.id !== id));
-      setActiveActionMenuId(null);
-    }
+    setFlyersList(flyersList.filter((f) => f.id !== id));
+    setActiveActionMenuId(null);
+    setDeleteConfirmId(null);
   };
 
   const toggleActionMenu = (e, id) => {
@@ -365,7 +378,7 @@ const CompanyDashboard = () => {
                 </div>
                 <div className="company-stat-body">
                   <span className="company-stat-label">Active Flyers</span>
-                  <h3 className="company-stat-value">{flyersList.filter(f => f.status === "Active").length + 21}</h3>
+                  <h3 className="company-stat-value">{flyersList.filter(f => getFlyerStatus(f.expiryDate) === "Active").length + 21}</h3>
                 </div>
               </div>
             </section>
@@ -493,54 +506,92 @@ const CompanyDashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {flyersList.map((flyer) => (
-                      <tr key={flyer.id}>
-                        <td>
-                          <div className="company-campaign-cell">
-                            <div className="company-campaign-img">
-                              <img src={flyer.image} alt={flyer.name} />
-                            </div>
-                            <div className="company-campaign-info">
-                              <h6>{flyer.name}</h6>
-                              <p>{flyer.started}</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="company-num-cell">{flyer.reach}</td>
-                        <td className="company-num-cell">{flyer.redemptions}</td>
-                        <td>
-                          <span className={`company-status-badge ${flyer.status.toLowerCase()}`}>
-                            {flyer.status}
-                          </span>
-                        </td>
-                        <td>
-                          <div className="company-action-dropdown-wrapper">
-                            <button
-                              className="company-action-menu-btn"
-                              onClick={(e) => toggleActionMenu(e, flyer.id)}
-                            >
-                              <MoreHorizontal size={18} />
-                            </button>
-                            {activeActionMenuId === flyer.id && (
-                              <div className="company-action-dropdown-menu">
-                                <button
-                                  className="company-action-dropdown-item"
-                                  onClick={(e) => handleEditClick(e, flyer)}
-                                >
-                                  Edit
-                                </button>
-                                <button
-                                  className="company-action-dropdown-item delete"
-                                  onClick={(e) => handleDeleteClick(e, flyer.id)}
-                                >
-                                  Delete
-                                </button>
+                    {flyersList.map((flyer) => {
+                      const status = getFlyerStatus(flyer.expiryDate);
+                      return (
+                        <tr key={flyer.id}>
+                          <td>
+                            <div className="company-campaign-cell">
+                              <div className="company-campaign-img">
+                                <img src={flyer.image} alt={flyer.name} />
                               </div>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
+                              <div className="company-campaign-info">
+                                <h6>{flyer.name}</h6>
+                                <p>{flyer.started}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="company-num-cell">{flyer.reach}</td>
+                          <td className="company-num-cell">{flyer.redemptions}</td>
+                          <td>
+                            <span className={`company-status-badge ${status.toLowerCase()}`}>
+                              {status}
+                            </span>
+                          </td>
+                          <td>
+                            <div className="company-action-dropdown-wrapper">
+                              <button
+                                className="company-action-menu-btn"
+                                onClick={(e) => toggleActionMenu(e, flyer.id)}
+                              >
+                                <MoreHorizontal size={18} />
+                              </button>
+                              {activeActionMenuId === flyer.id && (
+                                <>
+                                  <div
+                                    className="company-dropdown-backdrop"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setActiveActionMenuId(null);
+                                    }}
+                                  />
+                                  <div className="company-action-dropdown-menu">
+                                    {deleteConfirmId === flyer.id ? (
+                                      <>
+                                        <div className="company-delete-confirm-text">Confirm?</div>
+                                        <button
+                                          className="company-action-dropdown-item delete"
+                                          onClick={(e) => handleDeleteClick(e, flyer.id)}
+                                        >
+                                          Yes, Delete
+                                        </button>
+                                        <button
+                                          className="company-action-dropdown-item"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setDeleteConfirmId(null);
+                                          }}
+                                        >
+                                          Cancel
+                                        </button>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <button
+                                          className="company-action-dropdown-item"
+                                          onClick={(e) => handleEditClick(e, flyer)}
+                                        >
+                                          Edit
+                                        </button>
+                                        <button
+                                          className="company-action-dropdown-item delete"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setDeleteConfirmId(flyer.id);
+                                          }}
+                                        >
+                                          Delete
+                                        </button>
+                                      </>
+                                    )}
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -701,10 +752,9 @@ const CompanyDashboard = () => {
                     <div className="company-form-group">
                       <label>Expiration Date</label>
                       <input
-                        type="text"
+                        type="date"
                         value={expiryDate}
                         onChange={(e) => setExpiryDate(e.target.value)}
-                        placeholder="e.g. Dec 31"
                       />
                     </div>
                   </div>
@@ -740,7 +790,7 @@ const CompanyDashboard = () => {
                         </div>
 
                         <div className="company-flyer-card-footer">
-                          <span className="company-flyer-card-expiry">Expires {expiryDate || "Dec 31"}</span>
+                          <span className="company-flyer-card-expiry">Expires {formatExpiryDate(expiryDate) || "Dec 31"}</span>
                           <span className="company-flyer-card-rare-badge">
                             <Sparkles size={11} />
                             Rare Deal
