@@ -1,55 +1,55 @@
+import { useState, useEffect } from "react";
 import "./FlashSale.css";
-
-import flashSales from "../../data/flashSales";
-
+import flashSalesData from "../../data/flashSales";
 import FlashSaleCard from "./FlashSaleCard";
 
-const FlashSaleGrid=()=>{
+const FlashSaleGrid = () => {
+  const [sales, setSales] = useState([]);
 
-return(
+  useEffect(() => {
+    const loadFlashSales = () => {
+      const allSaved = localStorage.getItem("flynow_all_flash_sales");
+      let list = allSaved ? JSON.parse(allSaved) : [];
+      
+      const activeSales = list.filter((s) => s.expiresAt > Date.now());
+      if (activeSales.length !== list.length) {
+        localStorage.setItem("flynow_all_flash_sales", JSON.stringify(activeSales));
+      }
+      
+      setSales([...activeSales, ...flashSalesData]);
+    };
 
-<section className="flash-section">
+    loadFlashSales();
 
-<div className="section-heading">
+    const handleStorageChange = (e) => {
+      if (e.key === "flynow_all_flash_sales") {
+        loadFlashSales();
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
 
-<h2>
+    const interval = setInterval(loadFlashSales, 1000);
 
-🔥 Flash Sales
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
 
-</h2>
+  return (
+    <section className="flash-section">
+      <div className="section-heading">
+        <h2>🔥 Flash Sales</h2>
+        <p>Limited time offers ending today.</p>
+      </div>
 
-<p>
-
-Limited time offers ending today.
-
-</p>
-
-</div>
-
-<div className="flash-grid">
-
-{
-
-flashSales.map((sale)=>(
-
-<FlashSaleCard
-
-key={sale.id}
-
-sale={sale}
-
-/>
-
-))
-
-}
-
-</div>
-
-</section>
-
-);
-
+      <div className="flash-grid">
+        {sales.map((sale) => (
+          <FlashSaleCard key={sale.id} sale={sale} />
+        ))}
+      </div>
+    </section>
+  );
 };
 
 export default FlashSaleGrid;

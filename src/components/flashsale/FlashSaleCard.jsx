@@ -1,67 +1,70 @@
+import { useState, useEffect } from "react";
 import "./FlashSale.css";
 
 const FlashSaleCard = ({ sale }) => {
+  const [timeLeft, setTimeLeft] = useState("");
 
-return(
+  useEffect(() => {
+    let expiryTime = sale.expiresAt;
+    
+    if (!expiryTime) {
+      const match = sale.timer ? sale.timer.match(/(\d+)h\s*:\s*(\d+)m\s*:\s*(\d+)s/) : null;
+      if (match) {
+        const hours = parseInt(match[1], 10);
+        const minutes = parseInt(match[2], 10);
+        const seconds = parseInt(match[3], 10);
+        const durationMs = ((hours * 60 + minutes) * 60 + seconds) * 1000;
+        
+        expiryTime = Date.now() + durationMs;
+      } else {
+        expiryTime = Date.now() + 48 * 60 * 60 * 1000;
+      }
+    }
 
-<div className="flash-card">
+    const updateTimer = () => {
+      const diff = expiryTime - Date.now();
+      if (diff <= 0) {
+        setTimeLeft("Expired");
+        return;
+      }
 
-<div
-className="flash-top"
-style={{background:sale.color}}
->
+      const totalSec = Math.floor(diff / 1000);
+      const hrs = Math.floor(totalSec / 3600);
+      const mins = Math.floor((totalSec % 3600) / 60);
+      const secs = totalSec % 60;
 
-<span>
+      const pad = (num) => String(num).padStart(2, "0");
+      setTimeLeft(`${pad(hrs)}h : ${pad(mins)}m : ${pad(secs)}s`);
+    };
 
-{sale.brand}
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
 
-</span>
+    return () => clearInterval(interval);
+  }, [sale]);
 
-<div className="timer">
+  return (
+    <div className="flash-card">
+      <div
+        className="flash-top"
+        style={{ background: sale.color || "#B91C1C" }}
+      >
+        <span>{sale.brand}</span>
+        <div className="timer">
+          ⏰ {timeLeft}
+        </div>
+      </div>
 
-⏰ {sale.timer}
+      <img src={sale.image} alt={sale.title} style={{ height: "160px", objectFit: "cover" }} />
 
-</div>
-
-</div>
-
-<img
-src={sale.image}
-alt={sale.title}
-/>
-
-<div className="flash-body">
-
-<h3>
-
-{sale.title}
-
-</h3>
-
-<p>
-
-{sale.discount}
-
-</p>
-
-<h2>
-
-{sale.price}
-
-</h2>
-
-<button>
-
-Shop Now
-
-</button>
-
-</div>
-
-</div>
-
-);
-
+      <div className="flash-body">
+        <h3>{sale.title}</h3>
+        <p>{sale.discount}</p>
+        <h2>{sale.price || "₹999"}</h2>
+        <button style={{ color: "#1C1917" }}>Shop Now</button>
+      </div>
+    </div>
+  );
 };
 
 export default FlashSaleCard;

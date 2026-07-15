@@ -22,7 +22,8 @@ import {
   Building,
   ArrowRight,
   Plane,
-  ArrowLeft
+  ArrowLeft,
+  Zap
 } from "lucide-react";
 
 const CompanyDashboard = () => {
@@ -43,6 +44,14 @@ const CompanyDashboard = () => {
   const [promoCode, setPromoCode] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [flyerImage, setFlyerImage] = useState("");
+
+  // Flash sale form states
+  const [flashCompanyName, setFlashCompanyName] = useState("");
+  const [flashProductName, setFlashProductName] = useState("");
+  const [flashImage, setFlashImage] = useState("");
+  const [flashOfferDetails, setFlashOfferDetails] = useState("");
+  const [flashCategory, setFlashCategory] = useState("");
+  const [flashSalesList, setFlashSalesList] = useState([]);
 
   // Authentication states
   const [loggedCompany, setLoggedCompany] = useState(() => {
@@ -129,15 +138,24 @@ const CompanyDashboard = () => {
     }
   }, []);
 
-  // Sync flyers when loggedCompany changes
+  // Sync flyers and flash sales when loggedCompany changes
   useEffect(() => {
     if (loggedCompany) {
-      const saved = localStorage.getItem("flynow_all_flyers");
-      const list = saved ? JSON.parse(saved) : [];
-      const filtered = list.filter((f) => f.companyEmail === loggedCompany.email);
-      setFlyersList(filtered);
+      const savedFlyers = localStorage.getItem("flynow_all_flyers");
+      const listFlyers = savedFlyers ? JSON.parse(savedFlyers) : [];
+      const filteredFlyers = listFlyers.filter((f) => f.companyEmail === loggedCompany.email);
+      setFlyersList(filteredFlyers);
+
+      const savedFlash = localStorage.getItem("flynow_all_flash_sales");
+      const listFlash = savedFlash ? JSON.parse(savedFlash) : [];
+      const filteredFlash = listFlash.filter((f) => f.companyEmail === loggedCompany.email);
+      setFlashSalesList(filteredFlash);
+
+      setFlashCompanyName(loggedCompany.name || "");
+      setFlashCategory(loggedCompany.category || "");
     } else {
       setFlyersList([]);
+      setFlashSalesList([]);
     }
   }, [loggedCompany]);
 
@@ -170,6 +188,7 @@ const CompanyDashboard = () => {
   const sidebarMenu = [
     { name: "Dashboard", icon: <LayoutDashboard size={20} /> },
     { name: "My Flyers", icon: <Megaphone size={20} /> },
+    { name: "Flash Sales", icon: <Zap size={20} /> },
     { name: "Coupons", icon: <Ticket size={20} /> },
     { name: "Analytics", icon: <BarChart3 size={20} /> },
     { name: "Customers", icon: <Users size={20} /> },
@@ -192,6 +211,9 @@ const CompanyDashboard = () => {
       setPromoCode("");
       setExpiryDate("");
       setFlyerImage("");
+    } else if (menuName === "Flash Sales") {
+      setView("flash-sales");
+      setEditingFlyerId(null);
     }
   };
 
@@ -334,6 +356,71 @@ const CompanyDashboard = () => {
     }
     setActiveActionMenuId(null);
     setDeleteConfirmId(null);
+  };
+
+  const handleFlashImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFlashImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handlePublishFlashSale = () => {
+    if (!flashCompanyName.trim() || !flashProductName.trim() || !flashImage || !flashOfferDetails.trim() || !flashCategory) {
+      alert("Please fill out all fields and provide an image.");
+      return;
+    }
+
+    const newFlashSale = {
+      id: Date.now(),
+      brand: flashCompanyName,
+      title: flashProductName,
+      image: flashImage,
+      discount: flashOfferDetails,
+      category: flashCategory,
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 48 * 60 * 60 * 1000,
+      companyEmail: loggedCompany ? loggedCompany.email : "",
+      price: "₹999",
+      color: "#B91C1C"
+    };
+
+    const allSaved = localStorage.getItem("flynow_all_flash_sales");
+    const allList = allSaved ? JSON.parse(allSaved) : [];
+    const updatedAll = [newFlashSale, ...allList];
+    localStorage.setItem("flynow_all_flash_sales", JSON.stringify(updatedAll));
+
+    if (loggedCompany) {
+      const filtered = updatedAll.filter((f) => f.companyEmail === loggedCompany.email);
+      setFlashSalesList(filtered);
+    }
+
+    setFlashCompanyName(loggedCompany?.name || "");
+    setFlashCategory(loggedCompany?.category || "");
+    setFlashProductName("");
+    setFlashImage("");
+    setFlashOfferDetails("");
+
+    setView("flash-sales");
+  };
+
+  const handleDeleteFlash = (id) => {
+    const confirm = window.confirm("Are you sure you want to delete this flash sale?");
+    if (!confirm) return;
+
+    const allSaved = localStorage.getItem("flynow_all_flash_sales");
+    const allList = allSaved ? JSON.parse(allSaved) : [];
+    const updatedAll = allList.filter((f) => f.id !== id);
+    localStorage.setItem("flynow_all_flash_sales", JSON.stringify(updatedAll));
+
+    if (loggedCompany) {
+      const filtered = updatedAll.filter((f) => f.companyEmail === loggedCompany.email);
+      setFlashSalesList(filtered);
+    }
   };
 
   const toggleActionMenu = (e, id) => {
@@ -718,7 +805,7 @@ const CompanyDashboard = () => {
           </div>
         </header>
 
-        {view === "dashboard" ? (
+        {view === "dashboard" && (
           <>
             {/* Stats Grid */}
             <section className="company-stats-grid">
@@ -1026,7 +1113,9 @@ const CompanyDashboard = () => {
               )}
             </section>
           </>
-        ) : (
+        )}
+
+        {view === "create-flyer" && (
           /* Create / Edit Flyer Wizard */
           <div className="company-wizard-container">
             {/* Left Steps Panel */}
@@ -1250,6 +1339,241 @@ const CompanyDashboard = () => {
                     <Sparkles size={16} />
                   </button>
                 )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {view === "flash-sales" && (
+          <div className="company-wizard-container" style={{ display: 'block', padding: '24px' }}>
+            <div className="company-table-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h3 className="company-card-title" style={{ fontSize: '24px', fontWeight: '700', color: '#1C1917', margin: 0 }}>⚡ Flash Sales</h3>
+              <button 
+                className="company-create-btn" 
+                onClick={() => {
+                  setView("create-flash-sale");
+                  setFlashCompanyName(loggedCompany?.name || "");
+                  setFlashCategory(loggedCompany?.category || "");
+                  setFlashProductName("");
+                  setFlashImage("");
+                  setFlashOfferDetails("");
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  backgroundColor: '#F4B000',
+                  color: '#1C1917',
+                  border: 'none',
+                  padding: '12px 20px',
+                  borderRadius: '30px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 10px rgba(244,176,0,0.2)'
+                }}
+              >
+                <Plus size={18} />
+                <span>Create Flash Sale</span>
+              </button>
+            </div>
+
+            {flashSalesList.length > 0 ? (
+              <div className="company-table-container">
+                <table className="company-flyers-table">
+                  <thead>
+                    <tr>
+                      <th>Product Campaign</th>
+                      <th>Offer Details</th>
+                      <th>Category</th>
+                      <th>Time Remaining</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {flashSalesList.map((sale) => {
+                      const timeLeftMs = sale.expiresAt - Date.now();
+                      const hoursLeft = Math.max(0, Math.floor(timeLeftMs / (3600 * 1000)));
+                      return (
+                        <tr key={sale.id}>
+                          <td>
+                            <div className="company-campaign-cell">
+                              <div className="company-campaign-img">
+                                <img src={sale.image} alt={sale.title} />
+                              </div>
+                              <div className="company-campaign-info">
+                                <h6>{sale.title}</h6>
+                                <p>{sale.brand}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td>{sale.discount}</td>
+                          <td>{sale.category}</td>
+                          <td>
+                            <span className="company-status-badge active" style={{ backgroundColor: '#FFF8E6', color: '#F4B000' }}>
+                              ⚡ {hoursLeft} hrs left
+                            </span>
+                          </td>
+                          <td>
+                            <button
+                              className="company-action-dropdown-item delete"
+                              onClick={() => handleDeleteFlash(sale.id)}
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: '#EF4444',
+                                fontWeight: '700',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="company-empty-flyers-view">
+                <Sparkles className="empty-icon" size={48} />
+                <h5>No Flash Sales Active</h5>
+                <p>Add a new flash sale flyer to publish it on the home page and start the 48-hour countdown!</p>
+                <button
+                  className="use-preset-btn"
+                  style={{ marginTop: "16px", backgroundColor: "#5C4308", color: "#FFFDF9", border: "none" }}
+                  onClick={() => setView("create-flash-sale")}
+                >
+                  Create Flash Sale
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {view === "create-flash-sale" && (
+          <div className="company-wizard-container">
+            <div className="company-wizard-sidebar">
+              <div className="company-wizard-sidebar-header">
+                <h2>Create Flash Sale</h2>
+                <p>Flash sales are highly urgent promotions limited to exactly 48 hours. Fill in the fields below to publish a premium deal flyer.</p>
+              </div>
+              <div className="company-wizard-steps">
+                <div className="company-wizard-step active">
+                  <div className="company-step-num">⚡</div>
+                  <div className="company-step-desc">
+                    <span className="company-step-tag">DURATION</span>
+                    <span className="company-step-title">48 Hours Active</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="company-wizard-form-card">
+              <div className="company-step-content">
+                <div className="company-step-header">
+                  <Megaphone size={20} />
+                  <h3>Flash Flyer Details</h3>
+                </div>
+
+                <div className="company-form-row">
+                  <div className="company-form-group">
+                    <label>Company Name</label>
+                    <input
+                      type="text"
+                      value={flashCompanyName}
+                      onChange={(e) => setFlashCompanyName(e.target.value)}
+                      placeholder="e.g. Skyline Travel Group"
+                    />
+                  </div>
+
+                  <div className="company-form-group">
+                    <label>Product Name</label>
+                    <input
+                      type="text"
+                      value={flashProductName}
+                      onChange={(e) => setFlashProductName(e.target.value)}
+                      placeholder="e.g. Wireless Noise-Cancelling Headphones"
+                    />
+                  </div>
+                </div>
+
+                <div className="company-form-row">
+                  <div className="company-form-group">
+                    <label>Offer Details</label>
+                    <input
+                      type="text"
+                      value={flashOfferDetails}
+                      onChange={(e) => setFlashOfferDetails(e.target.value)}
+                      placeholder="e.g. 50% OFF or Buy 1 Get 1 Free"
+                    />
+                  </div>
+
+                  <div className="company-form-group">
+                    <label>Category</label>
+                    <select
+                      value={flashCategory}
+                      onChange={(e) => setFlashCategory(e.target.value)}
+                    >
+                      <option value="">Select a category</option>
+                      <option value="Travel">Travel</option>
+                      <option value="Electronics">Electronics</option>
+                      <option value="Fashion">Fashion</option>
+                      <option value="Grocery">Grocery</option>
+                      <option value="Skincare">Skincare</option>
+                      <option value="Food">Food</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="company-form-group">
+                  <label>Flyer Image</label>
+                  <div className="company-image-dropzone">
+                    <input
+                      type="file"
+                      id="flash-file-input"
+                      style={{ display: "none" }}
+                      onChange={handleFlashImageChange}
+                      accept="image/*"
+                    />
+                    {flashImage ? (
+                      <div className="company-preview-img-wrapper">
+                        <img src={flashImage} alt="Flash Flyer Preview" className="company-preview-img" />
+                        <div className="company-preview-overlay" onClick={() => document.getElementById("flash-file-input")?.click()}>
+                          <UploadCloud size={24} />
+                          <span>Change Image</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="company-dropzone-placeholder">
+                        <div onClick={() => document.getElementById("flash-file-input")?.click()} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer' }}>
+                          <UploadCloud size={32} className="company-upload-icon" />
+                          <span className="company-dropzone-title">Upload Product Image</span>
+                          <span className="company-dropzone-subtitle">PNG, JPG or WEBP (Max 10MB)</span>
+                        </div>
+                        <button
+                          type="button"
+                          className="use-preset-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setFlashImage("https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=500&q=80");
+                          }}
+                        >
+                          Use Sample Headphone
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="company-wizard-actions" style={{ marginTop: '24px', display: 'flex', gap: '16px' }}>
+                  <button className="company-wizard-btn secondary" onClick={() => setView("flash-sales")} style={{ cursor: 'pointer', padding: '12px 24px', borderRadius: '30px', border: '1px solid #E5E7EB', background: 'none', fontWeight: '700' }}>
+                    Cancel
+                  </button>
+                  <button className="company-wizard-btn primary" onClick={handlePublishFlashSale} style={{ cursor: 'pointer', padding: '12px 24px', borderRadius: '30px', border: 'none', backgroundColor: '#F4B000', color: '#1C1917', fontWeight: '700' }}>
+                    Publish Flash Sale
+                  </button>
+                </div>
               </div>
             </div>
           </div>
