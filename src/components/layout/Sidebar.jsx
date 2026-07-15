@@ -49,9 +49,9 @@ const Sidebar = () => {
 
       <div className="menu">
         {menu.map((item, index) => {
-          const isActive = location.pathname === item.path && item.title === "Home"
+          const isActive = item.title === "Home"
             ? location.pathname === "/"
-            : location.pathname === item.path;
+            : location.pathname === item.path && item.path !== "/";
 
           return (
             <Link
