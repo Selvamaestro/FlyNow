@@ -80,66 +80,13 @@ const CompanyDashboard = () => {
 
   const [flyersList, setFlyersList] = useState([]);
 
-  // Seed default demo company and load flyers list
+  // Initialize default arrays if they do not exist
   useEffect(() => {
-    const companies = JSON.parse(localStorage.getItem("flynow_companies") || "[]");
-    const demoExists = companies.some((c) => c.email === "demo@flynow.com");
-    if (!demoExists) {
-      const demoCompany = {
-        name: "Coffee House",
-        email: "demo@flynow.com",
-        phone: "1234567890",
-        category: "Food",
-        password: "demo"
-      };
-      companies.push(demoCompany);
-      localStorage.setItem("flynow_companies", JSON.stringify(companies));
+    if (!localStorage.getItem("flynow_companies")) {
+      localStorage.setItem("flynow_companies", JSON.stringify([]));
     }
-
-    // Seed global flyers if they do not exist
     if (!localStorage.getItem("flynow_all_flyers")) {
-      const demoFlyers = [
-        {
-          id: 1,
-          name: "Early Bird Coffee 20%",
-          companyName: "Coffee House",
-          category: "Food",
-          promoCode: "COFFEE20",
-          expiryDate: "2026-08-31",
-          started: "Started 3 days ago",
-          reach: "12,402",
-          redemptions: "842",
-          image: "/coffee_flyer.png",
-          companyEmail: "demo@flynow.com"
-        },
-        {
-          id: 2,
-          name: "Luxury Accessories Flash",
-          companyName: "Gold & Co",
-          category: "Fashion",
-          promoCode: "LUXURY15",
-          expiryDate: "2026-07-10",
-          started: "Ended 2 hours ago",
-          reach: "45,120",
-          redemptions: "2,109",
-          image: "/accessories_flyer.png",
-          companyEmail: "demo@flynow.com"
-        },
-        {
-          id: 3,
-          name: "Weekend Market Specials",
-          companyName: "Supermarket Inc",
-          category: "Grocery",
-          promoCode: "MARKETWEEK",
-          expiryDate: "2026-07-20",
-          started: "Started 1 day ago",
-          reach: "8,230",
-          redemptions: "312",
-          image: "/market_flyer.png",
-          companyEmail: "demo@flynow.com"
-        }
-      ];
-      localStorage.setItem("flynow_all_flyers", JSON.stringify(demoFlyers));
+      localStorage.setItem("flynow_all_flyers", JSON.stringify([]));
     }
   }, []);
 
@@ -153,13 +100,8 @@ const CompanyDashboard = () => {
 
       let savedFlash = localStorage.getItem("flynow_all_flash_sales");
       if (!savedFlash) {
-        const seededList = flashSalesData.map((item) => ({
-          ...item,
-          expiresAt: Date.now() + 48 * 60 * 60 * 1000,
-          companyEmail: "demo@flynow.com"
-        }));
-        localStorage.setItem("flynow_all_flash_sales", JSON.stringify(seededList));
-        savedFlash = JSON.stringify(seededList);
+        localStorage.setItem("flynow_all_flash_sales", JSON.stringify([]));
+        savedFlash = JSON.stringify([]);
       }
       const listFlash = JSON.parse(savedFlash);
       const filteredFlash = listFlash.filter((f) => f.companyEmail === loggedCompany.email);

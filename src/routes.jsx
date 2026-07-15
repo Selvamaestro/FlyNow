@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 
 import Home from "./pages/Home";
 import CompanyDashboard from "./pages/CompanyDashboard";
+import Categories from "./pages/Categories";
 
 import Admin from "./pages/admin/Admin";
 import CategoryManagement from "./pages/admin/CategoryManagement";
@@ -54,6 +55,10 @@ const AppRoutes = () => {
       <Route
         path="/admin/settings"
         element={<SettingsPage />}
+      />
+      <Route
+        path="/categories"
+        element={<Categories />}
       />
       <Route
         path="/company"

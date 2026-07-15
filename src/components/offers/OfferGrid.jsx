@@ -11,40 +11,8 @@ const OfferGrid = () => {
       if (allSaved) {
         setFlyers(JSON.parse(allSaved));
       } else {
-        const defaultFlyers = [
-          {
-            id: 1,
-            name: "Early Bird Coffee 20%",
-            companyName: "Coffee House",
-            category: "Food",
-            promoCode: "COFFEE20",
-            expiryDate: "2026-08-31",
-            image: "/coffee_flyer.png",
-            companyEmail: "demo@flynow.com"
-          },
-          {
-            id: 2,
-            name: "Luxury Accessories Flash",
-            companyName: "Gold & Co",
-            category: "Fashion",
-            promoCode: "LUXURY15",
-            expiryDate: "2026-07-10",
-            image: "/accessories_flyer.png",
-            companyEmail: "demo@flynow.com"
-          },
-          {
-            id: 3,
-            name: "Weekend Market Specials",
-            companyName: "Supermarket Inc",
-            category: "Grocery",
-            promoCode: "MARKETWEEK",
-            expiryDate: "2026-07-20",
-            image: "/market_flyer.png",
-            companyEmail: "demo@flynow.com"
-          }
-        ];
-        localStorage.setItem("flynow_all_flyers", JSON.stringify(defaultFlyers));
-        setFlyers(defaultFlyers);
+        localStorage.setItem("flynow_all_flyers", JSON.stringify([]));
+        setFlyers([]);
       }
     };
 
