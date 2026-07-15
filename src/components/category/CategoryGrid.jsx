@@ -1,6 +1,7 @@
 import "./Category.css";
 import categories from "../../data/categories";
 import CategoryCard from "./CategoryCard";
+import { Link } from "react-router-dom";
 
 const CategoryGrid = () => {
   return (
@@ -10,17 +11,22 @@ const CategoryGrid = () => {
           <h2>Browse Categories</h2>
           <p>Curated savings across everything you need</p>
         </div>
-        <button className="category-view-all-btn">
+        <Link to="/categories" className="category-view-all-btn" style={{ textDecoration: "none" }}>
           View All
-        </button>
+        </Link>
       </div>
 
       <div className="categories-grid">
         {categories.map((category) => (
-          <CategoryCard
-            key={category.id}
-            category={category}
-          />
+          <Link 
+            key={category.id} 
+            to={`/category/${category.icon}`}
+            style={{ textDecoration: "none" }}
+          >
+            <CategoryCard
+              category={category}
+            />
+          </Link>
         ))}
       </div>
     </section>

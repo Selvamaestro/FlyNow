@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import CompanyDashboard from "./pages/CompanyDashboard";
 import Categories from "./pages/Categories";
+import CategoryDetails from "./pages/CategoryDetails";
 
 import Admin from "./pages/admin/Admin";
 import CategoryManagement from "./pages/admin/CategoryManagement";
@@ -59,6 +60,10 @@ const AppRoutes = () => {
       <Route
         path="/categories"
         element={<Categories />}
+      />
+      <Route
+        path="/category/:categorySlug"
+        element={<CategoryDetails />}
       />
       <Route
         path="/company"
