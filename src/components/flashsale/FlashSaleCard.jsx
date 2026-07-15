@@ -1,8 +1,43 @@
 import { useState, useEffect } from "react";
 import "./FlashSale.css";
 
+const getOfferPriceDetails = (actualPrice, discountText, titleText) => {
+  if (!actualPrice) return null;
+  
+  const priceNum = parseFloat(String(actualPrice).replace(/[^0-9.]/g, ""));
+  if (isNaN(priceNum)) return null;
+
+  let pct = 0;
+  const pctMatch = (discountText + " " + titleText).match(/(\d+)\s*%/);
+  if (pctMatch) {
+    pct = parseFloat(pctMatch[1]);
+  } else {
+    const flatMatch = (discountText + " " + titleText).match(/(?:₹|rs\.?|inr)?\s*(\d+)\s*(?:off|discount)/i);
+    if (flatMatch) {
+      const flatAmt = parseFloat(flatMatch[1]);
+      const offerAmt = Math.max(0, Math.round(priceNum - flatAmt));
+      return {
+        original: `₹${Math.round(priceNum).toLocaleString()}`,
+        offer: `₹${offerAmt.toLocaleString()}`
+      };
+    }
+  }
+
+  const discountAmt = (priceNum * pct) / 100;
+  const offerAmt = Math.round(priceNum - discountAmt);
+
+  return {
+    original: `₹${Math.round(priceNum).toLocaleString()}`,
+    offer: `₹${offerAmt.toLocaleString()}`
+  };
+};
+
 const FlashSaleCard = ({ sale }) => {
   const [timeLeft, setTimeLeft] = useState("");
+
+  const loggedCompanyStr = localStorage.getItem("flynow_logged_in_company");
+  const loggedCompany = loggedCompanyStr ? JSON.parse(loggedCompanyStr) : null;
+  const isOwner = loggedCompany && (loggedCompany.name === sale.brand || loggedCompany.email === sale.companyEmail);
 
   useEffect(() => {
     let expiryTime = sale.expiresAt;
@@ -43,6 +78,24 @@ const FlashSaleCard = ({ sale }) => {
     return () => clearInterval(interval);
   }, [sale]);
 
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    const confirm = window.confirm(`Are you sure you want to delete "${sale.title}"?`);
+    if (!confirm) return;
+
+    const allSaved = localStorage.getItem("flynow_all_flash_sales");
+    const allList = allSaved ? JSON.parse(allSaved) : [];
+    const updatedAll = allList.filter((item) => item.id !== sale.id);
+    localStorage.setItem("flynow_all_flash_sales", JSON.stringify(updatedAll));
+    
+    // Dispatch a manual storage event so the grid updates instantly
+    window.dispatchEvent(new Event("storage"));
+  };
+
+  const priceInfo = getOfferPriceDetails(sale.actualPrice, sale.discount, sale.title);
+  const displayPrice = priceInfo ? priceInfo.offer : (sale.price || "₹999");
+  const originalPrice = priceInfo ? priceInfo.original : null;
+
   return (
     <div className="flash-card">
       <div
@@ -50,8 +103,30 @@ const FlashSaleCard = ({ sale }) => {
         style={{ background: sale.color || "#B91C1C" }}
       >
         <span>{sale.brand}</span>
-        <div className="timer">
-          ⏰ {timeLeft}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="timer">
+            ⏰ {timeLeft}
+          </div>
+          {isOwner && (
+            <button
+              onClick={handleDelete}
+              style={{
+                background: 'rgba(255,255,255,0.2)',
+                border: 'none',
+                color: '#FFF',
+                padding: '4px 8px',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                fontSize: '11px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              Delete
+            </button>
+          )}
         </div>
       </div>
 
@@ -60,7 +135,14 @@ const FlashSaleCard = ({ sale }) => {
       <div className="flash-body">
         <h3>{sale.title}</h3>
         <p>{sale.discount}</p>
-        <h2>{sale.price || "₹999"}</h2>
+        <h2 style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+          {displayPrice}
+          {originalPrice && (
+            <span style={{ textDecoration: "line-through", fontSize: "14px", color: "#888", fontWeight: "normal" }}>
+              {originalPrice}
+            </span>
+          )}
+        </h2>
         <button style={{ color: "#1C1917" }}>Shop Now</button>
       </div>
     </div>

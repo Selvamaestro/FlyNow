@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import flashSalesData from "../data/flashSales";
 import "./CompanyDashboard.css";
 import {
   LayoutDashboard,
@@ -44,6 +45,7 @@ const CompanyDashboard = () => {
   const [promoCode, setPromoCode] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [flyerImage, setFlyerImage] = useState("");
+  const [actualPrice, setActualPrice] = useState("");
 
   // Flash sale form states
   const [flashCompanyName, setFlashCompanyName] = useState("");
@@ -52,6 +54,8 @@ const CompanyDashboard = () => {
   const [flashOfferDetails, setFlashOfferDetails] = useState("");
   const [flashCategory, setFlashCategory] = useState("");
   const [flashSalesList, setFlashSalesList] = useState([]);
+  const [flashActualPrice, setFlashActualPrice] = useState("");
+  const [flashDurationHours, setFlashDurationHours] = useState("48");
 
   // Authentication states
   const [loggedCompany, setLoggedCompany] = useState(() => {
@@ -146,8 +150,17 @@ const CompanyDashboard = () => {
       const filteredFlyers = listFlyers.filter((f) => f.companyEmail === loggedCompany.email);
       setFlyersList(filteredFlyers);
 
-      const savedFlash = localStorage.getItem("flynow_all_flash_sales");
-      const listFlash = savedFlash ? JSON.parse(savedFlash) : [];
+      let savedFlash = localStorage.getItem("flynow_all_flash_sales");
+      if (!savedFlash) {
+        const seededList = flashSalesData.map((item) => ({
+          ...item,
+          expiresAt: Date.now() + 48 * 60 * 60 * 1000,
+          companyEmail: "demo@flynow.com"
+        }));
+        localStorage.setItem("flynow_all_flash_sales", JSON.stringify(seededList));
+        savedFlash = JSON.stringify(seededList);
+      }
+      const listFlash = JSON.parse(savedFlash);
       const filteredFlash = listFlash.filter((f) => f.companyEmail === loggedCompany.email);
       setFlashSalesList(filteredFlash);
 
@@ -166,12 +179,14 @@ const CompanyDashboard = () => {
     }
   }, [activeActionMenuId]);
 
-  // Helper: Format YYYY-MM-DD to "MMM DD"
+  // Helper: Format YYYY-MM-DDTHH:mm to "MMM DD at HH:MM"
   const formatExpiryDate = (dateStr) => {
     if (!dateStr) return "";
-    const date = new Date(dateStr + "T00:00:00");
+    const date = new Date(dateStr.includes("T") ? dateStr : dateStr + "T00:00:00");
     if (isNaN(date)) return dateStr;
-    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    const dateFormatted = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    const timeFormatted = date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return `${dateFormatted} at ${timeFormatted}`;
   };
 
   // Helper: Calculate if flyer is expired relative to current date (July 15, 2026)
@@ -179,9 +194,7 @@ const CompanyDashboard = () => {
     if (!expiryDateStr) return "Active";
     // Set reference today as 2026-07-15
     const today = new Date("2026-07-15T00:00:00");
-    today.setHours(0, 0, 0, 0);
-    const expiry = new Date(expiryDateStr + "T00:00:00");
-    expiry.setHours(0, 0, 0, 0);
+    const expiry = new Date(expiryDateStr.includes("T") ? expiryDateStr : expiryDateStr + "T00:00:00");
     return expiry < today ? "Expired" : "Active";
   };
 
@@ -211,6 +224,7 @@ const CompanyDashboard = () => {
       setPromoCode("");
       setExpiryDate("");
       setFlyerImage("");
+      setActualPrice("");
     } else if (menuName === "Flash Sales") {
       setView("flash-sales");
       setEditingFlyerId(null);
@@ -285,7 +299,8 @@ const CompanyDashboard = () => {
               category: category,
               promoCode: promoCode,
               expiryDate: expiryDate,
-              image: flyerImage
+              image: flyerImage,
+              actualPrice: actualPrice
             }
           : f
       );
@@ -300,6 +315,7 @@ const CompanyDashboard = () => {
         promoCode: promoCode,
         expiryDate: expiryDate,
         image: flyerImage,
+        actualPrice: actualPrice,
         started: "Started just now",
         reach: "0",
         redemptions: "0",
@@ -326,6 +342,7 @@ const CompanyDashboard = () => {
     setPromoCode("");
     setExpiryDate("");
     setFlyerImage("");
+    setActualPrice("");
   };
 
   const handleEditClick = (e, flyer) => {
@@ -337,6 +354,7 @@ const CompanyDashboard = () => {
     setPromoCode(flyer.promoCode || "");
     setExpiryDate(flyer.expiryDate || "");
     setFlyerImage(flyer.image || "");
+    setActualPrice(flyer.actualPrice || "");
 
     setView("create-flyer");
     setCurrentStep(1);
@@ -375,6 +393,8 @@ const CompanyDashboard = () => {
       return;
     }
 
+    const durationHrs = parseInt(flashDurationHours || 48, 10);
+
     const newFlashSale = {
       id: Date.now(),
       brand: flashCompanyName,
@@ -383,8 +403,9 @@ const CompanyDashboard = () => {
       discount: flashOfferDetails,
       category: flashCategory,
       createdAt: Date.now(),
-      expiresAt: Date.now() + 48 * 60 * 60 * 1000,
+      expiresAt: Date.now() + durationHrs * 60 * 60 * 1000,
       companyEmail: loggedCompany ? loggedCompany.email : "",
+      actualPrice: flashActualPrice,
       price: "₹999",
       color: "#B91C1C"
     };
@@ -404,6 +425,8 @@ const CompanyDashboard = () => {
     setFlashProductName("");
     setFlashImage("");
     setFlashOfferDetails("");
+    setFlashActualPrice("");
+    setFlashDurationHours("48");
 
     setView("flash-sales");
   };
@@ -1268,9 +1291,19 @@ const CompanyDashboard = () => {
                     </div>
 
                     <div className="company-form-group">
-                      <label>Expiration Date</label>
+                      <label>Actual Price (₹)</label>
                       <input
-                        type="date"
+                        type="number"
+                        value={actualPrice}
+                        onChange={(e) => setActualPrice(e.target.value)}
+                        placeholder="e.g. 1999"
+                      />
+                    </div>
+
+                    <div className="company-form-group">
+                      <label>Expiration Date & Time</label>
+                      <input
+                        type="datetime-local"
                         value={expiryDate}
                         onChange={(e) => setExpiryDate(e.target.value)}
                       />
@@ -1523,6 +1556,29 @@ const CompanyDashboard = () => {
                       <option value="Skincare">Skincare</option>
                       <option value="Food">Food</option>
                     </select>
+                  </div>
+                </div>
+
+                <div className="company-form-row">
+                  <div className="company-form-group">
+                    <label>Actual Price (₹)</label>
+                    <input
+                      type="number"
+                      value={flashActualPrice}
+                      onChange={(e) => setFlashActualPrice(e.target.value)}
+                      placeholder="e.g. 1999"
+                    />
+                  </div>
+
+                  <div className="company-form-group">
+                    <label>Duration (Hours)</label>
+                    <input
+                      type="number"
+                      value={flashDurationHours}
+                      onChange={(e) => setFlashDurationHours(e.target.value)}
+                      placeholder="e.g. 48"
+                      min="1"
+                    />
                   </div>
                 </div>
 
