@@ -62,9 +62,7 @@ const HeroSlider = () => {
   </button>
 
   <button className="secondary-btn">
-
-    Browse Categories
-
+    Explore Offers
   </button>
 
 </div>
@@ -98,17 +96,7 @@ const HeroSlider = () => {
 
       </div>
 
-      <div className="hero-image">
 
-        <img
-
-          src={heroSlides[current].image}
-
-          alt="Hero"
-
-        />
-
-      </div>
 
       <div className="slider-dots">
 

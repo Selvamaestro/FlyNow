@@ -3,28 +3,28 @@
 
 :root {
   /* Color Palette */
-  --primary: #2563EB;
-  --primary-hover: #1d4ed8;
-  --primary-light: #eff6ff;
-  --primary-glow: rgba(37, 99, 235, 0.15);
+  --primary: #F4B000;
+  --primary-hover: #D49600;
+  --primary-light: #FFF9E6;
+  --primary-glow: rgba(244, 176, 0, 0.15);
   
-  --secondary: #3B82F6;
-  --secondary-light: #f0f9ff;
+  --secondary: #EAB308;
+  --secondary-light: #FEF08A;
   
   --success: #10B981;
   --success-light: #ecfdf5;
   
-  --dark-bg: #1e293b;
-  --text-dark: #1e293b;
-  --text-muted: #64748b;
-  --text-light: #94a3b8;
+  --dark-bg: #1C1917;
+  --text-dark: #3C3325;
+  --text-muted: #8C8070;
+  --text-light: #B5A896;
   
-  --bg-main: #f8fafc;
-  --bg-card: #ffffff;
-  --bg-sidebar: #ffffff;
+  --bg-main: #FAF6F0;
+  --bg-card: #FFFDF9;
+  --bg-sidebar: #FFFDF9;
   
-  --border: #e2e8f0;
-  --border-focus: #cbd5e1;
+  --border: #EFE6D9;
+  --border-focus: #D2C4B4;
   
   --badge-danger: #ef4444;
   --badge-warning: #f59e0b;
@@ -210,13 +210,14 @@ input, select {
 }
 
 .menu-item.active {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-  color: white;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  background: var(--primary);
+  color: #1C1917;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(244, 176, 0, 0.2);
 }
 
 .menu-item.active .menu-item-icon {
-  color: white;
+  color: #1C1917;
 }
 
 .badge {

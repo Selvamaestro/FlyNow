@@ -9,7 +9,8 @@ import {
   Gift,
   User,
   HelpCircle,
-  Building2
+  Building2,
+  Plane
 } from "lucide-react";
 
 const Sidebar = () => {
@@ -37,8 +38,13 @@ const Sidebar = () => {
   return (
     <div className="sidebar">
       <Link to="/" className="logo">
-        <div className="logo-circle">🎁</div>
-        <h2>FlyNow</h2>
+        <div className="logo-icon-box">
+          <Plane size={24} style={{ transform: "rotate(-45deg)" }} />
+        </div>
+        <div className="logo-text-box">
+          <h2>FlyNow</h2>
+          <span>Premium Savings</span>
+        </div>
       </Link>
 
       <div className="menu">
