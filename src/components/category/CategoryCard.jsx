@@ -1,5 +1,4 @@
 import "./Category.css";
-
 import {
   House,
   Laptop,
@@ -13,38 +12,58 @@ import {
   Sofa,
 } from "lucide-react";
 
-const iconMap = {
-  home: <House size={52} color="white" />,
-  electronics: <Laptop size={52} color="white" />,
-  baby: <Baby size={52} color="white" />,
-  fashion: <Shirt size={52} color="white" />,
-  footwear: <Footprints size={52} color="white" />,
-  cookware: <CookingPot size={52} color="white" />,
-  skincare: <Sparkles size={52} color="white" />,
-  grocery: <ShoppingCart size={52} color="white" />,
-  sports: <Trophy size={52} color="white" />,
-  furniture: <Sofa size={52} color="white" />,
+const categoryStyleMap = {
+  home: { bg: "#FEF2F2", color: "#B91C1C", iconBg: "#FEE2E2" },
+  electronics: { bg: "#EFF6FF", color: "#1E40AF", iconBg: "#DBEAFE" },
+  baby: { bg: "#FDF2F8", color: "#9D174D", iconBg: "#FCE7F3" },
+  fashion: { bg: "#F5F3FF", color: "#5B21B6", iconBg: "#EDE9FE" },
+  footwear: { bg: "#ECFDF5", color: "#047857", iconBg: "#D1FAE5" },
+  cookware: { bg: "#FFFBEB", color: "#B45309", iconBg: "#FEF3C7" },
+  skincare: { bg: "#F0FDF4", color: "#15803D", iconBg: "#DCFCE7" },
+  grocery: { bg: "#F0FDF4", color: "#15803D", iconBg: "#DCFCE7" },
+  sports: { bg: "#FEF2F2", color: "#B91C1C", iconBg: "#FEE2E2" },
+  furniture: { bg: "#FEF3C7", color: "#B45309", iconBg: "#FEF3C7" },
 };
 
 const CategoryCard = ({ category }) => {
-  return (
-    <div className="category-card">
+  const styles = categoryStyleMap[category.icon] || { bg: "#FAF6F0", color: "#3C3325", iconBg: "#EFE6D9" };
 
-      <div
-        className="category-icon"
-        style={{
-          background: `linear-gradient(135deg, ${category.gradient[0]}, ${category.gradient[1]})`,
-        }}
+  const iconMap = {
+    home: <House size={20} color={styles.color} />,
+    electronics: <Laptop size={20} color={styles.color} />,
+    baby: <Baby size={20} color={styles.color} />,
+    fashion: <Shirt size={20} color={styles.color} />,
+    footwear: <Footprints size={20} color={styles.color} />,
+    cookware: <CookingPot size={20} color={styles.color} />,
+    skincare: <Sparkles size={20} color={styles.color} />,
+    grocery: <ShoppingCart size={20} color={styles.color} />,
+    sports: <Trophy size={20} color={styles.color} />,
+    furniture: <Sofa size={20} color={styles.color} />,
+  };
+
+  const displayName = category.title === "Home Products" 
+    ? "Home" 
+    : category.title === "Baby Products" 
+      ? "Baby" 
+      : category.title;
+
+  return (
+    <div 
+      className="category-pill-card"
+      style={{ backgroundColor: styles.bg }}
+    >
+      <div 
+        className="category-pill-icon-wrapper"
+        style={{ backgroundColor: styles.iconBg }}
       >
         {iconMap[category.icon]}
       </div>
-
-      <h3>{category.title}</h3>
-
-      <p className="offer-count">
-        {category.offers}
-      </p>
-
+      <span 
+        className="category-pill-title"
+        style={{ color: styles.color }}
+      >
+        {displayName}
+      </span>
     </div>
   );
 };

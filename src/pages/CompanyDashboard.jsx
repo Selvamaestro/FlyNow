@@ -80,7 +80,10 @@ const CompanyDashboard = () => {
       };
       companies.push(demoCompany);
       localStorage.setItem("flynow_companies", JSON.stringify(companies));
+    }
 
+    // Seed global flyers if they do not exist
+    if (!localStorage.getItem("flynow_all_flyers")) {
       const demoFlyers = [
         {
           id: 1,
@@ -92,7 +95,8 @@ const CompanyDashboard = () => {
           started: "Started 3 days ago",
           reach: "12,402",
           redemptions: "842",
-          image: "/coffee_flyer.png"
+          image: "/coffee_flyer.png",
+          companyEmail: "demo@flynow.com"
         },
         {
           id: 2,
@@ -104,7 +108,8 @@ const CompanyDashboard = () => {
           started: "Ended 2 hours ago",
           reach: "45,120",
           redemptions: "2,109",
-          image: "/accessories_flyer.png"
+          image: "/accessories_flyer.png",
+          companyEmail: "demo@flynow.com"
         },
         {
           id: 3,
@@ -116,18 +121,21 @@ const CompanyDashboard = () => {
           started: "Started 1 day ago",
           reach: "8,230",
           redemptions: "312",
-          image: "/market_flyer.png"
+          image: "/market_flyer.png",
+          companyEmail: "demo@flynow.com"
         }
       ];
-      localStorage.setItem("flynow_flyers_demo@flynow.com", JSON.stringify(demoFlyers));
+      localStorage.setItem("flynow_all_flyers", JSON.stringify(demoFlyers));
     }
   }, []);
 
   // Sync flyers when loggedCompany changes
   useEffect(() => {
     if (loggedCompany) {
-      const saved = localStorage.getItem("flynow_flyers_" + loggedCompany.email);
-      setFlyersList(saved ? JSON.parse(saved) : []);
+      const saved = localStorage.getItem("flynow_all_flyers");
+      const list = saved ? JSON.parse(saved) : [];
+      const filtered = list.filter((f) => f.companyEmail === loggedCompany.email);
+      setFlyersList(filtered);
     } else {
       setFlyersList([]);
     }
@@ -240,10 +248,13 @@ const CompanyDashboard = () => {
       return;
     }
 
-    let updatedList;
+    const allSaved = localStorage.getItem("flynow_all_flyers");
+    const allList = allSaved ? JSON.parse(allSaved) : [];
+    let updatedAll;
+
     if (editingFlyerId) {
       // Edit existing flyer
-      updatedList = flyersList.map((f) =>
+      updatedAll = allList.map((f) =>
         f.id === editingFlyerId
           ? {
               ...f,
@@ -269,14 +280,17 @@ const CompanyDashboard = () => {
         image: flyerImage,
         started: "Started just now",
         reach: "0",
-        redemptions: "0"
+        redemptions: "0",
+        companyEmail: loggedCompany ? loggedCompany.email : ""
       };
-      updatedList = [newFlyer, ...flyersList];
+      updatedAll = [newFlyer, ...allList];
     }
 
-    setFlyersList(updatedList);
+    localStorage.setItem("flynow_all_flyers", JSON.stringify(updatedAll));
+
     if (loggedCompany) {
-      localStorage.setItem("flynow_flyers_" + loggedCompany.email, JSON.stringify(updatedList));
+      const filtered = updatedAll.filter((f) => f.companyEmail === loggedCompany.email);
+      setFlyersList(filtered);
     }
 
     setView("dashboard");
@@ -309,10 +323,14 @@ const CompanyDashboard = () => {
 
   const handleDeleteClick = (e, id) => {
     e.stopPropagation();
-    const updatedList = flyersList.filter((f) => f.id !== id);
-    setFlyersList(updatedList);
+    const allSaved = localStorage.getItem("flynow_all_flyers");
+    const allList = allSaved ? JSON.parse(allSaved) : [];
+    const updatedAll = allList.filter((f) => f.id !== id);
+    localStorage.setItem("flynow_all_flyers", JSON.stringify(updatedAll));
+
     if (loggedCompany) {
-      localStorage.setItem("flynow_flyers_" + loggedCompany.email, JSON.stringify(updatedList));
+      const filtered = updatedAll.filter((f) => f.companyEmail === loggedCompany.email);
+      setFlyersList(filtered);
     }
     setActiveActionMenuId(null);
     setDeleteConfirmId(null);
