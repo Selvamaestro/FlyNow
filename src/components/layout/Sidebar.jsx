@@ -23,7 +23,14 @@ const Sidebar = () => {
     { icon: <Wallet size={20} />, title: "Coupon Wallet", path: "/" },
     { icon: <Gift size={20} />, title: "Rewards", path: "/" },
     { icon: <User size={20} />, title: "Profile", path: "/" },
-    { icon: <Building2 size={20} />, title: "Company Portal", path: "/company" },
+    {
+      icon: <Building2 size={20} />,
+      title: "Company Portal",
+      path: "/company",
+      onClick: () => {
+        localStorage.removeItem("flynow_logged_in_company");
+      }
+    },
     { icon: <HelpCircle size={20} />, title: "Support", path: "/" }
   ];
 
@@ -45,6 +52,7 @@ const Sidebar = () => {
               to={item.path}
               className={`menu-item ${isActive ? "active" : ""}`}
               key={index}
+              onClick={item.onClick}
             >
               {item.icon}
               <span>{item.title}</span>
