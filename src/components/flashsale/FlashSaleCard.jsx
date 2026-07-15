@@ -85,7 +85,7 @@ const FlashSaleCard = ({ sale }) => {
 
     const allSaved = localStorage.getItem("flynow_all_flash_sales");
     const allList = allSaved ? JSON.parse(allSaved) : [];
-    const updatedAll = allList.filter((item) => item.id !== sale.id);
+    const updatedAll = allList.filter((item) => String(item.id) !== String(sale.id));
     localStorage.setItem("flynow_all_flash_sales", JSON.stringify(updatedAll));
     
     // Dispatch a manual storage event so the grid updates instantly
@@ -107,26 +107,6 @@ const FlashSaleCard = ({ sale }) => {
           <div className="timer">
             ⏰ {timeLeft}
           </div>
-          {isOwner && (
-            <button
-              onClick={handleDelete}
-              style={{
-                background: 'rgba(255,255,255,0.2)',
-                border: 'none',
-                color: '#FFF',
-                padding: '4px 8px',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                fontSize: '11px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              Delete
-            </button>
-          )}
         </div>
       </div>
 

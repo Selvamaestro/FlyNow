@@ -56,6 +56,7 @@ const CompanyDashboard = () => {
   const [flashSalesList, setFlashSalesList] = useState([]);
   const [flashActualPrice, setFlashActualPrice] = useState("");
   const [flashDurationHours, setFlashDurationHours] = useState("48");
+  const [editingFlashId, setEditingFlashId] = useState(null);
 
   // Authentication states
   const [loggedCompany, setLoggedCompany] = useState(() => {
@@ -213,10 +214,12 @@ const CompanyDashboard = () => {
     if (menuName === "Dashboard") {
       setView("dashboard");
       setEditingFlyerId(null);
+      setEditingFlashId(null);
     } else if (menuName === "My Flyers") {
       setView("create-flyer");
       setCurrentStep(1);
       setEditingFlyerId(null);
+      setEditingFlashId(null);
       // Reset and prefill company details from the logged in profile
       setCompanyName(loggedCompany?.name || "");
       setCategory(loggedCompany?.category || "");
@@ -228,6 +231,7 @@ const CompanyDashboard = () => {
     } else if (menuName === "Flash Sales") {
       setView("flash-sales");
       setEditingFlyerId(null);
+      setEditingFlashId(null);
     }
   };
 
@@ -395,24 +399,46 @@ const CompanyDashboard = () => {
 
     const durationHrs = parseInt(flashDurationHours || 48, 10);
 
-    const newFlashSale = {
-      id: Date.now(),
-      brand: flashCompanyName,
-      title: flashProductName,
-      image: flashImage,
-      discount: flashOfferDetails,
-      category: flashCategory,
-      createdAt: Date.now(),
-      expiresAt: Date.now() + durationHrs * 60 * 60 * 1000,
-      companyEmail: loggedCompany ? loggedCompany.email : "",
-      actualPrice: flashActualPrice,
-      price: "₹999",
-      color: "#B91C1C"
-    };
-
     const allSaved = localStorage.getItem("flynow_all_flash_sales");
     const allList = allSaved ? JSON.parse(allSaved) : [];
-    const updatedAll = [newFlashSale, ...allList];
+    let updatedAll;
+
+    if (editingFlashId) {
+      // Edit existing flash sale
+      updatedAll = allList.map((f) =>
+        String(f.id) === String(editingFlashId)
+          ? {
+              ...f,
+              brand: flashCompanyName,
+              title: flashProductName,
+              image: flashImage,
+              discount: flashOfferDetails,
+              category: flashCategory,
+              actualPrice: flashActualPrice,
+              expiresAt: (f.createdAt || Date.now()) + durationHrs * 60 * 60 * 1000,
+            }
+          : f
+      );
+      setEditingFlashId(null);
+    } else {
+      // Create new flash sale
+      const newFlashSale = {
+        id: Date.now(),
+        brand: flashCompanyName,
+        title: flashProductName,
+        image: flashImage,
+        discount: flashOfferDetails,
+        category: flashCategory,
+        createdAt: Date.now(),
+        expiresAt: Date.now() + durationHrs * 60 * 60 * 1000,
+        companyEmail: loggedCompany ? loggedCompany.email : "",
+        actualPrice: flashActualPrice,
+        price: "₹999",
+        color: "#B91C1C"
+      };
+      updatedAll = [newFlashSale, ...allList];
+    }
+
     localStorage.setItem("flynow_all_flash_sales", JSON.stringify(updatedAll));
 
     if (loggedCompany) {
@@ -429,21 +455,42 @@ const CompanyDashboard = () => {
     setFlashDurationHours("48");
 
     setView("flash-sales");
+
+    // Dispatch a manual storage event so other components update instantly
+    window.dispatchEvent(new Event("storage"));
   };
 
-  const handleDeleteFlash = (id) => {
-    const confirm = window.confirm("Are you sure you want to delete this flash sale?");
-    if (!confirm) return;
+  const handleEditFlashClick = (e, sale) => {
+    e.stopPropagation();
+    setEditingFlashId(sale.id);
+    setFlashCompanyName(sale.brand || "");
+    setFlashCategory(sale.category || "");
+    setFlashProductName(sale.title || "");
+    setFlashImage(sale.image || "");
+    setFlashOfferDetails(sale.discount || "");
+    setFlashActualPrice(sale.actualPrice || "");
+    const durationHrs = sale.expiresAt && sale.createdAt ? Math.round((sale.expiresAt - sale.createdAt) / (3600 * 1000)) : 48;
+    setFlashDurationHours(String(durationHrs));
+
+    setView("create-flash-sale");
+    setActiveActionMenuId(null);
+  };
+
+  const handleDeleteFlash = (e, id) => {
+    if (e) e.stopPropagation();
 
     const allSaved = localStorage.getItem("flynow_all_flash_sales");
     const allList = allSaved ? JSON.parse(allSaved) : [];
-    const updatedAll = allList.filter((f) => f.id !== id);
+    const updatedAll = allList.filter((f) => String(f.id) !== String(id));
     localStorage.setItem("flynow_all_flash_sales", JSON.stringify(updatedAll));
 
     if (loggedCompany) {
       const filtered = updatedAll.filter((f) => f.companyEmail === loggedCompany.email);
       setFlashSalesList(filtered);
     }
+
+    // Dispatch a manual storage event so other components update instantly
+    window.dispatchEvent(new Event("storage"));
   };
 
   const toggleActionMenu = (e, id) => {
@@ -1447,19 +1494,69 @@ const CompanyDashboard = () => {
                             </span>
                           </td>
                           <td>
-                            <button
-                              className="company-action-dropdown-item delete"
-                              onClick={() => handleDeleteFlash(sale.id)}
-                              style={{
-                                background: 'transparent',
-                                border: 'none',
-                                color: '#EF4444',
-                                fontWeight: '700',
-                                cursor: 'pointer'
-                              }}
-                            >
-                              Delete
-                            </button>
+                            <div className="company-action-dropdown-wrapper">
+                              <button
+                                className="company-action-menu-btn"
+                                onClick={(e) => toggleActionMenu(e, sale.id)}
+                              >
+                                <MoreHorizontal size={18} />
+                              </button>
+                              {activeActionMenuId === sale.id && (
+                                <>
+                                  <div
+                                    className="company-dropdown-backdrop"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setActiveActionMenuId(null);
+                                    }}
+                                  />
+                                  <div className="company-action-dropdown-menu">
+                                    {deleteConfirmId === sale.id ? (
+                                      <>
+                                        <div className="company-delete-confirm-text">Confirm?</div>
+                                        <button
+                                          className="company-action-dropdown-item delete"
+                                          onClick={(e) => {
+                                            handleDeleteFlash(e, sale.id);
+                                            setActiveActionMenuId(null);
+                                            setDeleteConfirmId(null);
+                                          }}
+                                        >
+                                          Yes, Delete
+                                        </button>
+                                        <button
+                                          className="company-action-dropdown-item"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setDeleteConfirmId(null);
+                                          }}
+                                        >
+                                          Cancel
+                                        </button>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <button
+                                          className="company-action-dropdown-item"
+                                          onClick={(e) => handleEditFlashClick(e, sale)}
+                                        >
+                                          Edit
+                                        </button>
+                                        <button
+                                          className="company-action-dropdown-item delete"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setDeleteConfirmId(sale.id);
+                                          }}
+                                        >
+                                          Delete
+                                        </button>
+                                      </>
+                                    )}
+                                  </div>
+                                </>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       );
@@ -1488,7 +1585,7 @@ const CompanyDashboard = () => {
           <div className="company-wizard-container">
             <div className="company-wizard-sidebar">
               <div className="company-wizard-sidebar-header">
-                <h2>Create Flash Sale</h2>
+                <h2>{editingFlashId ? "Edit Flash Sale" : "Create Flash Sale"}</h2>
                 <p>Flash sales are highly urgent promotions limited to exactly 48 hours. Fill in the fields below to publish a premium deal flyer.</p>
               </div>
               <div className="company-wizard-steps">
@@ -1627,7 +1724,7 @@ const CompanyDashboard = () => {
                     Cancel
                   </button>
                   <button className="company-wizard-btn primary" onClick={handlePublishFlashSale} style={{ cursor: 'pointer', padding: '12px 24px', borderRadius: '30px', border: 'none', backgroundColor: '#F4B000', color: '#1C1917', fontWeight: '700' }}>
-                    Publish Flash Sale
+                    {editingFlashId ? "Save Changes" : "Publish Flash Sale"}
                   </button>
                 </div>
               </div>
