@@ -1,16 +1,45 @@
 import "./Offers.css";
 
+const getOfferPriceDetails = (actualPrice, discountText, titleText) => {
+  if (!actualPrice) return null;
+  
+  const priceNum = parseFloat(String(actualPrice).replace(/[^0-9.]/g, ""));
+  if (isNaN(priceNum)) return null;
+
+  let pct = 0;
+  const pctMatch = (discountText + " " + titleText).match(/(\d+)\s*%/);
+  if (pctMatch) {
+    pct = parseFloat(pctMatch[1]);
+  } else {
+    const flatMatch = (discountText + " " + titleText).match(/(?:₹|rs\.?|inr)?\s*(\d+)\s*(?:off|discount)/i);
+    if (flatMatch) {
+      const flatAmt = parseFloat(flatMatch[1]);
+      const offerAmt = Math.max(0, Math.round(priceNum - flatAmt));
+      return {
+        original: `₹${Math.round(priceNum).toLocaleString()}`,
+        offer: `₹${offerAmt.toLocaleString()}`
+      };
+    }
+  }
+
+  const discountAmt = (priceNum * pct) / 100;
+  const offerAmt = Math.round(priceNum - discountAmt);
+
+  return {
+    original: `₹${Math.round(priceNum).toLocaleString()}`,
+    offer: `₹${offerAmt.toLocaleString()}`
+  };
+};
+
 const OfferCard = ({ offer }) => {
   const hasImage = !!offer.image;
 
-  // Extract discount percentage or text from flyer name, or default to a standard label
   const getDiscountLabel = (nameStr) => {
     if (!nameStr) return "OFFER";
     const match = nameStr.match(/(\d+%\s*OFF|\d+%\s*Discount|\d+%\s*|₹\d+\s*OFF)/i);
     if (match) {
       return match[0].trim();
     }
-    // Fallback if name has numbers but no % or ₹ symbols
     const numMatch = nameStr.match(/(\d+)\s*(percent|rs|inr)/i);
     if (numMatch) return numMatch[0].trim();
     return "DEAL";
@@ -21,7 +50,24 @@ const OfferCard = ({ offer }) => {
   const cardTitle = offer.name || offer.title || "Special Deal";
   const cardDesc = offer.category ? `Category: ${offer.category}` : (offer.description || "Grab this limited time promotion today!");
   const couponCode = offer.promoCode || offer.coupon || "FLYNOW";
-  const validityText = offer.expiryDate ? `Expires: ${offer.expiryDate}` : (offer.validity || "Today Only");
+  
+  // Format datetime-local strings nicely if present
+  const formatExpiryDateStr = (dateStr) => {
+    if (!dateStr) return "Today Only";
+    if (dateStr.includes("T")) {
+      const d = new Date(dateStr);
+      if (!isNaN(d)) {
+        return "Expires: " + d.toLocaleDateString("en-US", { month: "short", day: "numeric" }) + " at " + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+    }
+    return `Expires: ${dateStr}`;
+  };
+
+  const validityText = offer.expiryDate ? formatExpiryDateStr(offer.expiryDate) : (offer.validity || "Today Only");
+
+  const priceInfo = getOfferPriceDetails(offer.actualPrice, discountVal, cardTitle);
+  const displayPrice = priceInfo ? priceInfo.offer : null;
+  const originalPrice = priceInfo ? priceInfo.original : null;
 
   return (
     <div className="offer-card">
@@ -55,11 +101,20 @@ const OfferCard = ({ offer }) => {
           {couponCode}
         </div>
 
-        <div className="offer-footer">
+        <div className="offer-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <small>{validityText}</small>
-          <button style={{ color: "#1C1917", cursor: "pointer" }}>
-            {offer.button || "Save Coupon"}
-          </button>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {priceInfo && (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', lineHeight: '1.2' }}>
+                <span style={{ fontSize: '18px', fontWeight: '800', color: '#1C1917' }}>{displayPrice}</span>
+                <span style={{ fontSize: '12px', textDecoration: 'line-through', color: '#78716C' }}>{originalPrice}</span>
+              </div>
+            )}
+            <button style={{ color: "#1C1917", cursor: "pointer" }}>
+              {offer.button || "Save Coupon"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
