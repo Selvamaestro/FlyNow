@@ -44,44 +44,94 @@ const CompanyDashboard = () => {
   const [expiryDate, setExpiryDate] = useState("");
   const [flyerImage, setFlyerImage] = useState("");
 
-  const [flyersList, setFlyersList] = useState([
-    {
-      id: 1,
-      name: "Early Bird Coffee 20%",
-      companyName: "Coffee House",
-      category: "Food",
-      promoCode: "COFFEE20",
-      expiryDate: "2026-08-31",
-      started: "Started 3 days ago",
-      reach: "12,402",
-      redemptions: "842",
-      image: "/coffee_flyer.png"
-    },
-    {
-      id: 2,
-      name: "Luxury Accessories Flash",
-      companyName: "Gold & Co",
-      category: "Fashion",
-      promoCode: "LUXURY15",
-      expiryDate: "2026-07-10",
-      started: "Ended 2 hours ago",
-      reach: "45,120",
-      redemptions: "2,109",
-      image: "/accessories_flyer.png"
-    },
-    {
-      id: 3,
-      name: "Weekend Market Specials",
-      companyName: "Supermarket Inc",
-      category: "Grocery",
-      promoCode: "MARKETWEEK",
-      expiryDate: "2026-07-20",
-      started: "Started 1 day ago",
-      reach: "8,230",
-      redemptions: "312",
-      image: "/market_flyer.png"
+  // Authentication states
+  const [loggedCompany, setLoggedCompany] = useState(() => {
+    const saved = localStorage.getItem("flynow_logged_in_company");
+    return saved ? JSON.parse(saved) : null;
+  });
+  const [authView, setAuthView] = useState("login"); // "login" or "register"
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [authMessage, setAuthMessage] = useState(null); // { type: 'success' | 'error', text: '' }
+
+  // Login form inputs
+  const [authEmailOrPhone, setAuthEmailOrPhone] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+
+  // Registration form inputs
+  const [regName, setRegName] = useState("");
+  const [regEmail, setRegEmail] = useState("");
+  const [regPhone, setRegPhone] = useState("");
+  const [regCategory, setRegCategory] = useState("");
+  const [regPassword, setRegPassword] = useState("");
+
+  const [flyersList, setFlyersList] = useState([]);
+
+  // Seed default demo company and load flyers list
+  useEffect(() => {
+    const companies = JSON.parse(localStorage.getItem("flynow_companies") || "[]");
+    const demoExists = companies.some((c) => c.email === "demo@flynow.com");
+    if (!demoExists) {
+      const demoCompany = {
+        name: "Coffee House",
+        email: "demo@flynow.com",
+        phone: "1234567890",
+        category: "Food",
+        password: "demo"
+      };
+      companies.push(demoCompany);
+      localStorage.setItem("flynow_companies", JSON.stringify(companies));
+
+      const demoFlyers = [
+        {
+          id: 1,
+          name: "Early Bird Coffee 20%",
+          companyName: "Coffee House",
+          category: "Food",
+          promoCode: "COFFEE20",
+          expiryDate: "2026-08-31",
+          started: "Started 3 days ago",
+          reach: "12,402",
+          redemptions: "842",
+          image: "/coffee_flyer.png"
+        },
+        {
+          id: 2,
+          name: "Luxury Accessories Flash",
+          companyName: "Gold & Co",
+          category: "Fashion",
+          promoCode: "LUXURY15",
+          expiryDate: "2026-07-10",
+          started: "Ended 2 hours ago",
+          reach: "45,120",
+          redemptions: "2,109",
+          image: "/accessories_flyer.png"
+        },
+        {
+          id: 3,
+          name: "Weekend Market Specials",
+          companyName: "Supermarket Inc",
+          category: "Grocery",
+          promoCode: "MARKETWEEK",
+          expiryDate: "2026-07-20",
+          started: "Started 1 day ago",
+          reach: "8,230",
+          redemptions: "312",
+          image: "/market_flyer.png"
+        }
+      ];
+      localStorage.setItem("flynow_flyers_demo@flynow.com", JSON.stringify(demoFlyers));
     }
-  ]);
+  }, []);
+
+  // Sync flyers when loggedCompany changes
+  useEffect(() => {
+    if (loggedCompany) {
+      const saved = localStorage.getItem("flynow_flyers_" + loggedCompany.email);
+      setFlyersList(saved ? JSON.parse(saved) : []);
+    } else {
+      setFlyersList([]);
+    }
+  }, [loggedCompany]);
 
   // Sync delete confirmation state with active menu
   useEffect(() => {
@@ -127,9 +177,9 @@ const CompanyDashboard = () => {
       setView("create-flyer");
       setCurrentStep(1);
       setEditingFlyerId(null);
-      // Reset fields
-      setCompanyName("");
-      setCategory("");
+      // Reset and prefill company details from the logged in profile
+      setCompanyName(loggedCompany?.name || "");
+      setCategory(loggedCompany?.category || "");
       setCampaignTitle("");
       setPromoCode("");
       setExpiryDate("");
@@ -190,22 +240,21 @@ const CompanyDashboard = () => {
       return;
     }
 
+    let updatedList;
     if (editingFlyerId) {
       // Edit existing flyer
-      setFlyersList(
-        flyersList.map((f) =>
-          f.id === editingFlyerId
-            ? {
-                ...f,
-                name: campaignTitle,
-                companyName: companyName,
-                category: category,
-                promoCode: promoCode,
-                expiryDate: expiryDate,
-                image: flyerImage
-              }
-            : f
-        )
+      updatedList = flyersList.map((f) =>
+        f.id === editingFlyerId
+          ? {
+              ...f,
+              name: campaignTitle,
+              companyName: companyName,
+              category: category,
+              promoCode: promoCode,
+              expiryDate: expiryDate,
+              image: flyerImage
+            }
+          : f
       );
       setEditingFlyerId(null);
     } else {
@@ -222,7 +271,12 @@ const CompanyDashboard = () => {
         reach: "0",
         redemptions: "0"
       };
-      setFlyersList([newFlyer, ...flyersList]);
+      updatedList = [newFlyer, ...flyersList];
+    }
+
+    setFlyersList(updatedList);
+    if (loggedCompany) {
+      localStorage.setItem("flynow_flyers_" + loggedCompany.email, JSON.stringify(updatedList));
     }
 
     setView("dashboard");
@@ -255,7 +309,11 @@ const CompanyDashboard = () => {
 
   const handleDeleteClick = (e, id) => {
     e.stopPropagation();
-    setFlyersList(flyersList.filter((f) => f.id !== id));
+    const updatedList = flyersList.filter((f) => f.id !== id);
+    setFlyersList(updatedList);
+    if (loggedCompany) {
+      localStorage.setItem("flynow_flyers_" + loggedCompany.email, JSON.stringify(updatedList));
+    }
     setActiveActionMenuId(null);
     setDeleteConfirmId(null);
   };
@@ -264,6 +322,282 @@ const CompanyDashboard = () => {
     e.stopPropagation();
     setActiveActionMenuId(activeActionMenuId === id ? null : id);
   };
+
+  // Auth Submit Handlers
+  const handleLoginSubmit = (e) => {
+    e.preventDefault();
+    setAuthMessage(null);
+
+    if (!authEmailOrPhone.trim() || !authPassword) {
+      setAuthMessage({ type: "error", text: "Please fill out all fields." });
+      return;
+    }
+
+    const companies = JSON.parse(localStorage.getItem("flynow_companies") || "[]");
+    const found = companies.find(
+      (c) =>
+        (c.email.toLowerCase() === authEmailOrPhone.toLowerCase() || c.phone === authEmailOrPhone) &&
+        c.password === authPassword
+    );
+
+    if (found) {
+      localStorage.setItem("flynow_logged_in_company", JSON.stringify(found));
+      setLoggedCompany(found);
+      setAuthEmailOrPhone("");
+      setAuthPassword("");
+    } else {
+      setAuthMessage({ type: "error", text: "Invalid email/phone or password." });
+    }
+  };
+
+  const handleRegisterSubmit = (e) => {
+    e.preventDefault();
+    setAuthMessage(null);
+
+    if (!regName.trim() || !regPhone.trim() || !regEmail.trim() || !regCategory || !regPassword) {
+      setAuthMessage({ type: "error", text: "Please fill out all registration fields." });
+      return;
+    }
+
+    const companies = JSON.parse(localStorage.getItem("flynow_companies") || "[]");
+    const emailExists = companies.some((c) => c.email.toLowerCase() === regEmail.toLowerCase());
+    const phoneExists = companies.some((c) => c.phone === regPhone);
+
+    if (emailExists) {
+      setAuthMessage({ type: "error", text: "Company Email is already registered." });
+      return;
+    }
+    if (phoneExists) {
+      setAuthMessage({ type: "error", text: "Phone Number is already registered." });
+      return;
+    }
+
+    const newCompany = {
+      name: regName,
+      phone: regPhone,
+      email: regEmail,
+      category: regCategory,
+      password: regPassword
+    };
+
+    companies.push(newCompany);
+    localStorage.setItem("flynow_companies", JSON.stringify(companies));
+
+    // Save empty list for the new company
+    localStorage.setItem("flynow_flyers_" + regEmail, JSON.stringify([]));
+
+    // Set success banner message on the login form
+    setAuthMessage({
+      type: "success",
+      text: "Registration successful! Please log in to access your portal."
+    });
+
+    // Prefill login input and redirect to sign-in tab
+    setAuthEmailOrPhone(regEmail);
+    setAuthView("login");
+
+    // Reset registration fields
+    setRegName("");
+    setRegPhone("");
+    setRegEmail("");
+    setRegCategory("");
+    setRegPassword("");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("flynow_logged_in_company");
+    setLoggedCompany(null);
+    setFlyersList([]);
+    setProfileMenuOpen(false);
+  };
+
+  // Dynamic Statistics based on Company Identity
+  const isDemo = loggedCompany?.email === "demo@flynow.com";
+  const totalRedemptions = isDemo ? "1,429" : flyersList.reduce((acc, f) => acc + parseInt(f.redemptions || 0), 0);
+  const totalRevenue = isDemo ? "$12,840" : `$${(flyersList.reduce((acc, f) => acc + parseInt(f.redemptions || 0), 0) * 15).toLocaleString()}`;
+  const activeFlyersCount = flyersList.filter(f => getFlyerStatus(f.expiryDate) === "Active").length + (isDemo ? 21 : 0);
+
+  // Authentication View
+  if (!loggedCompany) {
+    return (
+      <div className="company-auth-container">
+        {/* Left Side: Brand Visual */}
+        <div className="company-auth-hero">
+          <div className="company-auth-hero-content">
+            <div className="company-auth-logo">F</div>
+            <h2>Grow Your Business with FlyNow</h2>
+            <p>Publish premium flyers, share coupons, and track customer engagement in real-time. Reach thousands of savvy shoppers near you.</p>
+            <div className="company-auth-features">
+              <div className="auth-feature-item">
+                <Megaphone className="feature-icon" size={24} />
+                <div>
+                  <h4>Instant Campaign Launch</h4>
+                  <p>Create and publish interactive flyers in less than 2 minutes.</p>
+                </div>
+              </div>
+              <div className="auth-feature-item">
+                <Ticket className="feature-icon" size={24} />
+                <div>
+                  <h4>Coupon Distribution</h4>
+                  <p>Generate secure codes and drive high-intent foot traffic.</p>
+                </div>
+              </div>
+              <div className="auth-feature-item">
+                <BarChart3 className="feature-icon" size={24} />
+                <div>
+                  <h4>Real-time Analytics</h4>
+                  <p>Monitor impressions, views, and redemption metrics live.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="company-auth-hero-footer">
+            <span>© 2026 FlyNow Inc.</span>
+          </div>
+        </div>
+
+        {/* Right Side: Forms */}
+        <div className="company-auth-form-side">
+          <div className="company-auth-form-card">
+            <div className="company-auth-tabs">
+              <button
+                className={`company-auth-tab ${authView === "login" ? "active" : ""}`}
+                onClick={() => {
+                  setAuthView("login");
+                  setAuthMessage(null);
+                }}
+              >
+                Sign In
+              </button>
+              <button
+                className={`company-auth-tab ${authView === "register" ? "active" : ""}`}
+                onClick={() => {
+                  setAuthView("register");
+                  setAuthMessage(null);
+                }}
+              >
+                Register
+              </button>
+            </div>
+
+            {authMessage && (
+              <div className={`company-auth-message ${authMessage.type}`}>
+                <span>{authMessage.text}</span>
+                <button className="company-auth-message-close" onClick={() => setAuthMessage(null)}>×</button>
+              </div>
+            )}
+
+            {authView === "login" ? (
+              <form className="company-auth-form" onSubmit={handleLoginSubmit}>
+                <h3>Welcome Back</h3>
+                <p className="auth-subtitle">Sign in to manage your company flyers and analytics.</p>
+
+                <div className="company-form-group">
+                  <label>Email Address or Phone Number</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. merchant@flynow.com"
+                    value={authEmailOrPhone}
+                    onChange={(e) => setAuthEmailOrPhone(e.target.value)}
+                  />
+                </div>
+
+                <div className="company-form-group">
+                  <label>Password</label>
+                  <input
+                    type="password"
+                    required
+                    placeholder="••••••••"
+                    value={authPassword}
+                    onChange={(e) => setAuthPassword(e.target.value)}
+                  />
+                </div>
+
+                <button type="submit" className="company-auth-submit-btn">
+                  Sign In
+                </button>
+              </form>
+            ) : (
+              <form className="company-auth-form" onSubmit={handleRegisterSubmit}>
+                <h3>Create Merchant Account</h3>
+                <p className="auth-subtitle">Get started with a free business profile today.</p>
+
+                <div className="company-form-group">
+                  <label>Company Name</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Skyline Travel Group"
+                    value={regName}
+                    onChange={(e) => setRegName(e.target.value)}
+                  />
+                </div>
+
+                <div className="company-form-row">
+                  <div className="company-form-group">
+                    <label>Company Email</label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="e.g. merchant@flynow.com"
+                      value={regEmail}
+                      onChange={(e) => setRegEmail(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="company-form-group">
+                    <label>Phone Number</label>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="e.g. 1234567890"
+                      value={regPhone}
+                      onChange={(e) => setRegPhone(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="company-form-row">
+                  <div className="company-form-group">
+                    <label>Category</label>
+                    <select
+                      required
+                      value={regCategory}
+                      onChange={(e) => setRegCategory(e.target.value)}
+                    >
+                      <option value="">Select a category</option>
+                      <option value="Travel">Travel</option>
+                      <option value="Electronics">Electronics</option>
+                      <option value="Fashion">Fashion</option>
+                      <option value="Grocery">Grocery</option>
+                      <option value="Skincare">Skincare</option>
+                      <option value="Food">Food</option>
+                    </select>
+                  </div>
+
+                  <div className="company-form-group">
+                    <label>Password</label>
+                    <input
+                      type="password"
+                      required
+                      placeholder="••••••••"
+                      value={regPassword}
+                      onChange={(e) => setRegPassword(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <button type="submit" className="company-auth-submit-btn">
+                  Register Account
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="company-layout">
@@ -293,6 +627,12 @@ const CompanyDashboard = () => {
         <div className="company-promo-card">
           <p>Unlock detailed heatmaps and advanced customer segmentation.</p>
           <button className="company-premium-btn">Get Premium</button>
+        </div>
+
+        <div className="company-sidebar-footer">
+          <button className="company-logout-btn" onClick={handleLogout}>
+            <span>Log Out</span>
+          </button>
         </div>
       </aside>
 
@@ -324,8 +664,38 @@ const CompanyDashboard = () => {
                 <span>Create New Flyer</span>
               </button>
             )}
-            <div className="company-profile-avatar">
-              <img src="https://i.pravatar.cc/100?img=47" alt="Profile" />
+            <div className="company-profile-dropdown-wrapper">
+              <button
+                className="company-profile-avatar-btn"
+                onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+              >
+                <div className="company-profile-avatar-placeholder">
+                  {loggedCompany?.name ? loggedCompany.name.charAt(0).toUpperCase() : "C"}
+                </div>
+              </button>
+              {profileMenuOpen && (
+                <>
+                  <div
+                    className="company-dropdown-backdrop"
+                    onClick={() => setProfileMenuOpen(false)}
+                  />
+                  <div className="company-profile-dropdown-menu">
+                    <div className="company-profile-dropdown-header">
+                      <div className="company-profile-avatar-placeholder large">
+                        {loggedCompany?.name ? loggedCompany.name.charAt(0).toUpperCase() : "C"}
+                      </div>
+                      <div className="company-profile-dropdown-info">
+                        <h6>{loggedCompany?.name}</h6>
+                        <span>{loggedCompany?.email}</span>
+                      </div>
+                    </div>
+                    <div className="company-profile-dropdown-divider" />
+                    <button className="company-profile-dropdown-item logout" onClick={handleLogout}>
+                      Log Out
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </header>
@@ -347,7 +717,7 @@ const CompanyDashboard = () => {
                 </div>
                 <div className="company-stat-body">
                   <span className="company-stat-label">Coupon Redemptions</span>
-                  <h3 className="company-stat-value">1,429</h3>
+                  <h3 className="company-stat-value">{totalRedemptions}</h3>
                 </div>
               </div>
 
@@ -364,7 +734,7 @@ const CompanyDashboard = () => {
                 </div>
                 <div className="company-stat-body">
                   <span className="company-stat-label">Revenue Saved</span>
-                  <h3 className="company-stat-value">$12,840</h3>
+                  <h3 className="company-stat-value">{totalRevenue}</h3>
                 </div>
               </div>
 
@@ -378,7 +748,7 @@ const CompanyDashboard = () => {
                 </div>
                 <div className="company-stat-body">
                   <span className="company-stat-label">Active Flyers</span>
-                  <h3 className="company-stat-value">{flyersList.filter(f => getFlyerStatus(f.expiryDate) === "Active").length + 21}</h3>
+                  <h3 className="company-stat-value">{activeFlyersCount}</h3>
                 </div>
               </div>
             </section>
@@ -392,94 +762,118 @@ const CompanyDashboard = () => {
                     <h4 className="company-card-title">Coupon Redemption Graph</h4>
                     <p className="company-card-subtitle">Hourly tracking of user engagement</p>
                   </div>
-                  <div className="company-toggle-group">
-                    <button
-                      className={`company-toggle-btn ${graphMode === "Week" ? "active" : ""}`}
-                      onClick={() => setGraphMode("Week")}
-                    >
-                      Week
-                    </button>
-                    <button
-                      className={`company-toggle-btn ${graphMode === "Month" ? "active" : ""}`}
-                      onClick={() => setGraphMode("Month")}
-                    >
-                      Month
-                    </button>
-                  </div>
+                  {isDemo && (
+                    <div className="company-toggle-group">
+                      <button
+                        className={`company-toggle-btn ${graphMode === "Week" ? "active" : ""}`}
+                        onClick={() => setGraphMode("Week")}
+                      >
+                        Week
+                      </button>
+                      <button
+                        className={`company-toggle-btn ${graphMode === "Month" ? "active" : ""}`}
+                        onClick={() => setGraphMode("Month")}
+                      >
+                        Month
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="company-chart-container">
-                  <div className="company-bars-wrapper">
-                    <div className="company-bar-col">
-                      <div className="company-bar" style={{ height: "35%" }}></div>
-                      <span className="company-bar-label">MON</span>
+                  {isDemo ? (
+                    <div className="company-bars-wrapper">
+                      <div className="company-bar-col">
+                        <div className="company-bar" style={{ height: "35%" }}></div>
+                        <span className="company-bar-label">MON</span>
+                      </div>
+                      <div className="company-bar-col">
+                        <div className="company-bar" style={{ height: "45%" }}></div>
+                      </div>
+                      <div className="company-bar-col">
+                        <div className="company-bar" style={{ height: "55%" }}></div>
+                        <span className="company-bar-label">TUE</span>
+                      </div>
+                      <div className="company-bar-col">
+                        <div className="company-bar" style={{ height: "50%" }}></div>
+                      </div>
+                      <div className="company-bar-col">
+                        <div className="company-bar warning" style={{ height: "70%" }}></div>
+                        <span className="company-bar-label">WED</span>
+                      </div>
+                      <div className="company-bar-col">
+                        <div className="company-bar danger" style={{ height: "95%" }}></div>
+                      </div>
+                      <div className="company-bar-col">
+                        <div className="company-bar" style={{ height: "65%" }}></div>
+                        <span className="company-bar-label">THU</span>
+                      </div>
+                      <div className="company-bar-col">
+                        <div className="company-bar" style={{ height: "40%" }}></div>
+                      </div>
+                      <div className="company-bar-col">
+                        <div className="company-bar warning" style={{ height: "60%" }}></div>
+                        <span className="company-bar-label">FRI</span>
+                      </div>
+                      <div className="company-bar-col">
+                        <div className="company-bar" style={{ height: "50%" }}></div>
+                      </div>
+                      <div className="company-bar-col">
+                        <div className="company-bar" style={{ height: "40%" }}></div>
+                        <span className="company-bar-label">SAT</span>
+                      </div>
+                      <div className="company-bar-col">
+                        <div className="company-bar" style={{ height: "30%" }}></div>
+                        <span className="company-bar-label">SUN</span>
+                      </div>
                     </div>
-                    <div className="company-bar-col">
-                      <div className="company-bar" style={{ height: "45%" }}></div>
+                  ) : (
+                    <div className="company-chart-empty">
+                      <BarChart3 size={40} className="empty-chart-icon" />
+                      <h5>No Data Available Yet</h5>
+                      <p>Redemption statistics will start displaying here once customers begin scanning your published flyers.</p>
                     </div>
-                    <div className="company-bar-col">
-                      <div className="company-bar" style={{ height: "55%" }}></div>
-                      <span className="company-bar-label">TUE</span>
-                    </div>
-                    <div className="company-bar-col">
-                      <div className="company-bar" style={{ height: "50%" }}></div>
-                    </div>
-                    <div className="company-bar-col">
-                      <div className="company-bar warning" style={{ height: "70%" }}></div>
-                      <span className="company-bar-label">WED</span>
-                    </div>
-                    <div className="company-bar-col">
-                      <div className="company-bar danger" style={{ height: "95%" }}></div>
-                    </div>
-                    <div className="company-bar-col">
-                      <div className="company-bar" style={{ height: "65%" }}></div>
-                      <span className="company-bar-label">THU</span>
-                    </div>
-                    <div className="company-bar-col">
-                      <div className="company-bar" style={{ height: "40%" }}></div>
-                    </div>
-                    <div className="company-bar-col">
-                      <div className="company-bar warning" style={{ height: "60%" }}></div>
-                      <span className="company-bar-label">FRI</span>
-                    </div>
-                    <div className="company-bar-col">
-                      <div className="company-bar" style={{ height: "50%" }}></div>
-                    </div>
-                    <div className="company-bar-col">
-                      <div className="company-bar" style={{ height: "40%" }}></div>
-                      <span className="company-bar-label">SAT</span>
-                    </div>
-                    <div className="company-bar-col">
-                      <div className="company-bar" style={{ height: "30%" }}></div>
-                      <span className="company-bar-label">SUN</span>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </section>
 
               {/* Campaign Pulse Section */}
               <section className="company-pulse-card">
                 <h4 className="company-card-title">Campaign Pulse</h4>
-                
-                <div className="company-pulse-items">
-                  <div className="company-pulse-item brown-stripe">
-                    <h5>Flash Sale: Summer Kickoff</h5>
-                    <p>3,420 impressions today</p>
-                  </div>
 
-                  <div className="company-pulse-item blue-stripe">
-                    <h5>BOGO Drinks Weekend</h5>
-                    <p>892 redemptions</p>
-                  </div>
+                <div className="company-pulse-items">
+                  {isDemo ? (
+                    <>
+                      <div className="company-pulse-item brown-stripe">
+                        <h5>Flash Sale: Summer Kickoff</h5>
+                        <p>3,420 impressions today</p>
+                      </div>
+                      <div className="company-pulse-item blue-stripe">
+                        <h5>BOGO Drinks Weekend</h5>
+                        <p>892 redemptions</p>
+                      </div>
+                    </>
+                  ) : flyersList.length > 0 ? (
+                    flyersList.slice(0, 2).map((f, i) => (
+                      <div key={f.id} className={`company-pulse-item ${i % 2 === 0 ? "brown-stripe" : "blue-stripe"}`}>
+                        <h5>{f.name}</h5>
+                        <p>{f.reach} impressions / {f.redemptions} redemptions</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p style={{ fontSize: "13px", color: "#8C8070", margin: "10px 0" }}>
+                      No active campaign logs. Publish a flyer to start tracking logs.
+                    </p>
+                  )}
                 </div>
 
                 <div className="company-sentiment-section">
                   <div className="company-sentiment-info">
                     <span>Customer Sentiment</span>
-                    <span className="company-sentiment-score">4.8/5</span>
+                    <span className="company-sentiment-score">{isDemo ? "4.8/5" : "N/A"}</span>
                   </div>
                   <div className="company-sentiment-bar-bg">
-                    <div className="company-sentiment-bar-fill" style={{ width: "96%" }}></div>
+                    <div className="company-sentiment-bar-fill" style={{ width: isDemo ? "96%" : "0%" }}></div>
                   </div>
                 </div>
               </section>
@@ -489,112 +883,129 @@ const CompanyDashboard = () => {
             <section className="company-recent-flyers">
               <div className="company-table-header-row">
                 <h4 className="company-card-title">Recent Flyers</h4>
-                <button className="company-view-all-link">
-                  View All <ArrowUpRight size={16} />
-                </button>
+                {flyersList.length > 0 && (
+                  <button className="company-view-all-link">
+                    View All <ArrowUpRight size={16} />
+                  </button>
+                )}
               </div>
 
-              <div className="company-table-container">
-                <table className="company-flyers-table">
-                  <thead>
-                    <tr>
-                      <th>Flyer Campaign</th>
-                      <th>Reach</th>
-                      <th>Redemptions</th>
-                      <th>Status</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {flyersList.map((flyer) => {
-                      const status = getFlyerStatus(flyer.expiryDate);
-                      return (
-                        <tr key={flyer.id}>
-                          <td>
-                            <div className="company-campaign-cell">
-                              <div className="company-campaign-img">
-                                <img src={flyer.image} alt={flyer.name} />
+              {flyersList.length > 0 ? (
+                <div className="company-table-container">
+                  <table className="company-flyers-table">
+                    <thead>
+                      <tr>
+                        <th>Flyer Campaign</th>
+                        <th>Reach</th>
+                        <th>Redemptions</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {flyersList.map((flyer) => {
+                        const status = getFlyerStatus(flyer.expiryDate);
+                        return (
+                          <tr key={flyer.id}>
+                            <td>
+                              <div className="company-campaign-cell">
+                                <div className="company-campaign-img">
+                                  <img src={flyer.image} alt={flyer.name} />
+                                </div>
+                                <div className="company-campaign-info">
+                                  <h6>{flyer.name}</h6>
+                                  <p>{flyer.started}</p>
+                                </div>
                               </div>
-                              <div className="company-campaign-info">
-                                <h6>{flyer.name}</h6>
-                                <p>{flyer.started}</p>
+                            </td>
+                            <td className="company-num-cell">{flyer.reach}</td>
+                            <td className="company-num-cell">{flyer.redemptions}</td>
+                            <td>
+                              <span className={`company-status-badge ${status.toLowerCase()}`}>
+                                {status}
+                              </span>
+                            </td>
+                            <td>
+                              <div className="company-action-dropdown-wrapper">
+                                <button
+                                  className="company-action-menu-btn"
+                                  onClick={(e) => toggleActionMenu(e, flyer.id)}
+                                >
+                                  <MoreHorizontal size={18} />
+                                </button>
+                                {activeActionMenuId === flyer.id && (
+                                  <>
+                                    <div
+                                      className="company-dropdown-backdrop"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setActiveActionMenuId(null);
+                                      }}
+                                    />
+                                    <div className="company-action-dropdown-menu">
+                                      {deleteConfirmId === flyer.id ? (
+                                        <>
+                                          <div className="company-delete-confirm-text">Confirm?</div>
+                                          <button
+                                            className="company-action-dropdown-item delete"
+                                            onClick={(e) => handleDeleteClick(e, flyer.id)}
+                                          >
+                                            Yes, Delete
+                                          </button>
+                                          <button
+                                            className="company-action-dropdown-item"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              setDeleteConfirmId(null);
+                                            }}
+                                          >
+                                            Cancel
+                                          </button>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <button
+                                            className="company-action-dropdown-item"
+                                            onClick={(e) => handleEditClick(e, flyer)}
+                                          >
+                                            Edit
+                                          </button>
+                                          <button
+                                            className="company-action-dropdown-item delete"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              setDeleteConfirmId(flyer.id);
+                                            }}
+                                          >
+                                            Delete
+                                          </button>
+                                        </>
+                                      )}
+                                    </div>
+                                  </>
+                                )}
                               </div>
-                            </div>
-                          </td>
-                          <td className="company-num-cell">{flyer.reach}</td>
-                          <td className="company-num-cell">{flyer.redemptions}</td>
-                          <td>
-                            <span className={`company-status-badge ${status.toLowerCase()}`}>
-                              {status}
-                            </span>
-                          </td>
-                          <td>
-                            <div className="company-action-dropdown-wrapper">
-                              <button
-                                className="company-action-menu-btn"
-                                onClick={(e) => toggleActionMenu(e, flyer.id)}
-                              >
-                                <MoreHorizontal size={18} />
-                              </button>
-                              {activeActionMenuId === flyer.id && (
-                                <>
-                                  <div
-                                    className="company-dropdown-backdrop"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setActiveActionMenuId(null);
-                                    }}
-                                  />
-                                  <div className="company-action-dropdown-menu">
-                                    {deleteConfirmId === flyer.id ? (
-                                      <>
-                                        <div className="company-delete-confirm-text">Confirm?</div>
-                                        <button
-                                          className="company-action-dropdown-item delete"
-                                          onClick={(e) => handleDeleteClick(e, flyer.id)}
-                                        >
-                                          Yes, Delete
-                                        </button>
-                                        <button
-                                          className="company-action-dropdown-item"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            setDeleteConfirmId(null);
-                                          }}
-                                        >
-                                          Cancel
-                                        </button>
-                                      </>
-                                    ) : (
-                                      <>
-                                        <button
-                                          className="company-action-dropdown-item"
-                                          onClick={(e) => handleEditClick(e, flyer)}
-                                        >
-                                          Edit
-                                        </button>
-                                        <button
-                                          className="company-action-dropdown-item delete"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            setDeleteConfirmId(flyer.id);
-                                          }}
-                                        >
-                                          Delete
-                                        </button>
-                                      </>
-                                    )}
-                                  </div>
-                                </>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="company-empty-flyers-view">
+                  <Megaphone className="empty-icon" size={48} />
+                  <h5>No Flyers Published Yet</h5>
+                  <p>Create your first premium campaign using the wizard and start reaching shoppers today.</p>
+                  <button
+                    className="use-preset-btn"
+                    style={{ marginTop: "16px", backgroundColor: "#5C4308", color: "#FFFDF9", border: "none" }}
+                    onClick={() => handleMenuClick("My Flyers")}
+                  >
+                    Create Flyer
+                  </button>
+                </div>
+              )}
             </section>
           </>
         ) : (
@@ -830,7 +1241,7 @@ const CompanyDashboard = () => {
         <footer className="company-footer">
           <div className="company-footer-left">
             <h4>FlyNow Business</h4>
-            <p>© 2024 FlyNow Premium Discovery. All rights reserved.</p>
+            <p>© 2026 FlyNow Premium Discovery. All rights reserved.</p>
           </div>
           <div className="company-footer-right">
             <a href="#about">About Us</a>
