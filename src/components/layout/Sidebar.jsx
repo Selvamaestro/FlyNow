@@ -1,111 +1,65 @@
 import "./Sidebar.css";
-
+import { Link, useLocation } from "react-router-dom";
 import {
-Home,
-LayoutGrid,
-Tag,
-Zap,
-Wallet,
-Gift,
-User,
-HelpCircle
+  Home,
+  LayoutGrid,
+  Tag,
+  Zap,
+  Wallet,
+  Gift,
+  User,
+  HelpCircle,
+  Building2
 } from "lucide-react";
 
 const Sidebar = () => {
+  const location = useLocation();
 
-const menu=[
+  const menu = [
+    { icon: <Home size={20} />, title: "Home", path: "/" },
+    { icon: <LayoutGrid size={20} />, title: "Categories", path: "/" },
+    { icon: <Tag size={20} />, title: "Today's Offers", path: "/" },
+    { icon: <Zap size={20} />, title: "Flash Sales", path: "/" },
+    { icon: <Wallet size={20} />, title: "Coupon Wallet", path: "/" },
+    { icon: <Gift size={20} />, title: "Rewards", path: "/" },
+    { icon: <User size={20} />, title: "Profile", path: "/" },
+    { icon: <Building2 size={20} />, title: "Company Portal", path: "/company" },
+    { icon: <HelpCircle size={20} />, title: "Support", path: "/" }
+  ];
 
-{icon:<Home size={20}/>,title:"Home"},
+  return (
+    <div className="sidebar">
+      <Link to="/" className="logo">
+        <div className="logo-circle">🎁</div>
+        <h2>FlyNow</h2>
+      </Link>
 
-{icon:<LayoutGrid size={20}/>,title:"Categories"},
+      <div className="menu">
+        {menu.map((item, index) => {
+          const isActive = location.pathname === item.path && item.title === "Home" 
+            ? location.pathname === "/" 
+            : location.pathname === item.path;
 
-{icon:<Tag size={20}/>,title:"Today's Offers"},
+          return (
+            <Link
+              to={item.path}
+              className={`menu-item ${isActive ? "active" : ""}`}
+              key={index}
+            >
+              {item.icon}
+              <span>{item.title}</span>
+            </Link>
+          );
+        })}
+      </div>
 
-{icon:<Zap size={20}/>,title:"Flash Sales"},
-
-{icon:<Wallet size={20}/>,title:"Coupon Wallet"},
-
-{icon:<Gift size={20}/>,title:"Rewards"},
-
-{icon:<User size={20}/>,title:"Profile"},
-
-{icon:<HelpCircle size={20}/>,title:"Support"}
-
-];
-
-return(
-
-<div className="sidebar">
-
-<div className="logo">
-
-<div className="logo-circle">
-
-🎁
-
-</div>
-
-<h2>
-
-FlyNow
-
-</h2>
-
-</div>
-
-<div className="menu">
-
-{
-
-menu.map((item,index)=>(
-
-<div
-className={`menu-item ${index===0?"active":""}`}
-key={index}
->
-
-{item.icon}
-
-<span>
-
-{item.title}
-
-</span>
-
-</div>
-
-))
-
-}
-
-</div>
-
-<div className="coupon-card">
-
-<h3>
-
-🎉 Daily Rewards
-
-</h3>
-
-<p>
-
-Spin today and win exciting coupons.
-
-</p>
-
-<button>
-
-Spin Now
-
-</button>
-
-</div>
-
-</div>
-
-);
-
+      <div className="coupon-card">
+        <h3>🎉 Daily Rewards</h3>
+        <p>Spin today and win exciting coupons.</p>
+        <button>Spin Now</button>
+      </div>
+    </div>
+  );
 };
 
 export default Sidebar;
