@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Tag, Search, User, LogOut, LayoutDashboard, Bookmark } from 'lucide-react';
+import { Tag, Search, User, LogOut, LayoutDashboard, Wallet } from 'lucide-react';
 import { useAuth } from '../lib/auth-context';
 
 export default function PublicNavbar() {
@@ -12,6 +12,7 @@ export default function PublicNavbar() {
     { to: '/', label: 'Home' },
     { to: '/offers', label: 'Offers' },
     { to: '/categories', label: 'Categories' },
+    { to: '/saved', label: 'Wallet' },
     { to: '/about', label: 'About' },
     { to: '/contact', label: 'Contact' },
   ];
@@ -43,8 +44,13 @@ export default function PublicNavbar() {
                   <div style={{ position: 'fixed', inset: 0, zIndex: 40 }} onClick={() => setMenu(false)} />
                   <div className="card" style={{ position: 'absolute', right: 0, top: 48, zIndex: 50, minWidth: 200, padding: 8 }}>
                     <Link to="/profile" className="sidebar-link" onClick={() => setMenu(false)}><User size={16} /> Profile</Link>
-                    <Link to="/saved" className="sidebar-link" onClick={() => setMenu(false)}><Bookmark size={16} /> Saved Coupons</Link>
-                    {dashLink && <Link to={dashLink} className="sidebar-link" onClick={() => setMenu(false)}><LayoutDashboard size={16} /> Dashboard</Link>}
+<Link
+  to="/saved"
+  className="sidebar-link"
+  onClick={() => setMenu(false)}
+>
+  <Wallet size={16} /> Digital Wallet
+</Link>                    {dashLink && <Link to={dashLink} className="sidebar-link" onClick={() => setMenu(false)}><LayoutDashboard size={16} /> Dashboard</Link>}
                     <button className="sidebar-link" style={{ color: 'var(--danger)' }} onClick={() => { signOut(); setMenu(false); navigate('/'); }}><LogOut size={16} /> Logout</button>
                   </div>
                 </>

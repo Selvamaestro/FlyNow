@@ -22,7 +22,106 @@ export default function LandingPage() {
   const latest = (coupons ?? []).slice(0, 6);
 
   const search = () => navigate(`/offers?q=${encodeURIComponent(query)}`);
-
+const flashDeals = [
+  {
+    id: 1,
+    company: "Boat",
+    title: "Boat Rockerz 550",
+    image: "/images/boat.jpg",
+    discount: "45% OFF",
+    time: "Ends in 12h",
+  },
+  {
+    id: 2,
+    company: "Prestige",
+    title: "Cookware Carnival",
+    image: "/images/prestige.jpg",
+    discount: "30% OFF",
+    time: "Ends in 8h",
+  },
+  {
+    id: 3,
+    company: "Samsung",
+    title: "Smart TV Festival",
+    image: "/images/samsung-tv.jpg",
+    discount: "25% OFF",
+    time: "Ends in 6h",
+  },
+  {
+    id: 4,
+    company: "Dell",
+    title: "Laptop Weekend Sale",
+    image: "/images/dell.jpg",
+    discount: "18% OFF",
+    time: "Ends Tonight",
+  },
+];
+const exclusiveCoupons = [
+  {
+    id: 1,
+    company: "Nike",
+    title: "Sports Shoes Collection",
+    discount: "Flat 20% OFF",
+    code: "NIKE20",
+    image: "/images/nike.jpg",
+  },
+  {
+    id: 2,
+    company: "Myntra",
+    title: "Fashion Fiesta",
+    discount: "Extra 30% OFF",
+    code: "MYNTRA30",
+    image: "/images/myntra.jpg",
+  },
+  {
+    id: 3,
+    company: "IKEA",
+    title: "Living Room Collection",
+    discount: "Up to 35% OFF",
+    code: "IKEA35",
+    image: "/images/ikea.jpg",
+  },
+  {
+    id: 4,
+    company: "BigBasket",
+    title: "Fresh Grocery Deals",
+    discount: "Flat ₹200 OFF",
+    code: "BB200",
+    image: "/images/bigbasket.jpg",
+  },
+];
+const steps = [
+  {
+    icon: "🔍",
+    title: "Browse Offers",
+    desc: "Explore thousands of verified offers from top brands.",
+  },
+  {
+    icon: "💾",
+    title: "Save Coupon",
+    desc: "Save your favourite coupons with one click.",
+  },
+  {
+    icon: "👛",
+    title: "Open Wallet",
+    desc: "All saved coupons are stored securely in your wallet.",
+  },
+  {
+    icon: "📱",
+    title: "Show QR Code",
+    desc: "Open the coupon and display its QR code.",
+  },
+  {
+    icon: "🛒",
+    title: "Scan at Store",
+    desc: "The cashier scans your QR code instantly.",
+  },
+  {
+    icon: "🎉",
+    title: "Enjoy Savings",
+    desc: "Discount applied successfully. Happy Shopping!",
+  },
+];
   return (
     <div>
       {/* Hero */}
@@ -335,151 +434,587 @@ export default function LandingPage() {
     })}
   </div>
 </section>
-      {/* Featured Coupons */}
-      <section className="container" style={{ padding: '0 24px 56px' }}>
-        <div className="flex items-center justify-between mb-24">
-          <div><h2 style={{ fontSize: 28 }}>Featured Coupons</h2><p className="text-muted mt-8">Hand-picked top offers</p></div>
-          <Link to="/offers" className="btn btn-ghost btn-sm">See all <ArrowRight size={16} /></Link>
+{/* Today's Top Offers */}
+
+<section className="container" style={{ padding: "0 24px 70px" }}>
+  <div
+    className="flex items-center justify-between"
+    style={{ marginBottom: 30 }}
+  >
+    <div>
+      <h2
+        style={{
+          fontSize: 36,
+          fontWeight: 800,
+        }}
+      >
+        🔥 Today's Top Offers
+      </h2>
+
+      <p
+        style={{
+          color: "#777",
+          marginTop: 8,
+          fontSize: 17,
+        }}
+      >
+        Limited-time deals from top brands
+      </p>
+    </div>
+
+    <div
+      style={{
+        background: "#FFF3D2",
+        color: "#D89B17",
+        padding: "10px 18px",
+        borderRadius: 30,
+        fontWeight: 700,
+        fontSize: 15,
+      }}
+    >
+        Ends In • 08 : 34 : 20
+    </div>
+  </div>
+
+  {loading ? (
+    <PageLoader />
+  ) : (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(4,1fr)",
+        gap: 26,
+      }}
+    >
+      {featured.slice(0,4).map((coupon) => (
+        <div
+          key={coupon.id}
+          onClick={() => navigate(`/coupons/${coupon.id}`)}
+          style={{
+            background: "#fff",
+            borderRadius: 22,
+            overflow: "hidden",
+            cursor: "pointer",
+            boxShadow: "0 12px 28px rgba(0,0,0,.08)",
+            transition: ".3s",
+          }}
+        >
+          <div style={{ position: "relative" }}>
+            <img
+              src={coupon.flyer_image_url}
+              alt={coupon.title}
+              style={{
+                width: "100%",
+                height: 210,
+                objectFit: "cover",
+              }}
+            />
+
+            <div
+              style={{
+                position: "absolute",
+                top: 16,
+                left: 16,
+                background: "#F5B82E",
+                color: "#fff",
+                padding: "8px 16px",
+                borderRadius: 30,
+                fontWeight: 700,
+                fontSize: 14,
+              }}
+            >
+              {coupon.discount}
+            </div>
+          </div>
+
+          <div style={{ padding: 22 }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 16,
+              }}
+            >
+              <strong style={{ fontSize: 20 }}>
+                {coupon.company?.name}
+              </strong>
+
+              <span
+                style={{
+                  background: "#F7F4EE",
+                  padding: "6px 12px",
+                  borderRadius: 30,
+                  fontSize: 13,
+                }}
+              >
+                {coupon.category?.name}
+              </span>
+            </div>
+
+            <h3
+              style={{
+                fontSize: 22,
+                fontWeight: 700,
+                marginBottom: 12,
+              }}
+            >
+              {coupon.title}
+            </h3>
+
+            <p
+              style={{
+                color: "#666",
+                lineHeight: 1.6,
+                height: 52,
+                overflow: "hidden",
+              }}
+            >
+              {coupon.description}
+            </p>
+
+            <button
+              style={{
+                width: "100%",
+                marginTop: 22,
+                padding: "14px",
+                border: "none",
+                borderRadius: 14,
+                background: "#E4A817",
+                color: "#fff",
+                fontWeight: 700,
+                cursor: "pointer",
+                fontSize: 16,
+              }}
+            >
+              Save Coupon
+            </button>
+          </div>
         </div>
-        {loading ? <PageLoader /> : featured.length === 0 ? <EmptyState title="No coupons yet" message="Check back soon for featured offers." /> : (
-          <div className="grid grid-auto">
-            {featured.map((c) => <CouponCard key={c.id} coupon={c} onView={() => navigate(`/coupons/${c.id}`)} />)}
+      ))}
+    </div>
+  )}
+</section>
+
+<section className="container" style={{ padding: "60px 24px" }}>
+
+    <div
+        style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 28,
+        }}
+    >
+
+        <div>
+
+            <h2
+                style={{
+                    fontSize: 34,
+                    fontWeight: 700,
+                    marginBottom: 8,
+                }}
+            >
+                ⚡ Flash Deals
+            </h2>
+
+            <p
+                style={{
+                    color: "#777",
+                    fontSize: 18,
+                }}
+            >
+                Limited-time offers you shouldn't miss
+            </p>
+
+        </div>
+
+        <Link
+            to="/offers"
+            style={{
+                color: "#E4A817",
+                fontWeight: 600,
+                textDecoration: "none",
+            }}
+        >
+            View All →
+        </Link>
+
+    </div>
+
+    <div
+        style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4,1fr)",
+            gap: 24,
+        }}
+    >
+
+        {flashDeals.map((deal) => (
+
+            <div
+                key={deal.id}
+                style={{
+                    background: "#fff",
+                    borderRadius: 22,
+                    overflow: "hidden",
+                    boxShadow: "0 12px 35px rgba(0,0,0,.08)",
+                    transition: ".3s",
+                }}
+            >
+
+                <div style={{ position: "relative" }}>
+
+                    <img
+                        src={deal.image}
+                        alt={deal.title}
+                        style={{
+                            width: "100%",
+                            height: 210,
+                            objectFit: "cover",
+                        }}
+                    />
+
+                    <div
+                        style={{
+                            position: "absolute",
+                            top: 15,
+                            left: 15,
+                            background: "#F4B400",
+                            color: "#fff",
+                            padding: "8px 18px",
+                            borderRadius: 50,
+                            fontWeight: 700,
+                        }}
+                    >
+                        {deal.discount}
+                    </div>
+
+                </div>
+
+                <div style={{ padding: 22 }}>
+
+                    <p
+                        style={{
+                            color: "#888",
+                            marginBottom: 8,
+                            fontSize: 14,
+                        }}
+                    >
+                        {deal.company}
+                    </p>
+
+                    <h3
+                        style={{
+                            fontSize: 24,
+                            marginBottom: 16,
+                        }}
+                    >
+                        {deal.title}
+                    </h3>
+
+                    <div
+                        style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            marginBottom: 20,
+                        }}
+                    >
+
+                        <span
+                            style={{
+                                color: "#E53935",
+                                fontWeight: 700,
+                            }}
+                        >
+                            {deal.time}
+                        </span>
+
+                    </div>
+
+                    <button
+                        className="btn"
+                        style={{
+                            width: "100%",
+                            background: "#E4A817",
+                            color: "#fff",
+                            borderRadius: 14,
+                            border: "none",
+                            padding: "14px",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                        }}
+                    >
+                        Save Coupon
+                    </button>
+
+                </div>
+
+            </div>
+
+        ))}
+
+    </div>
+
+</section>
+
+
+<section className="container" style={{ padding: "60px 24px" }}>
+
+    <div
+        style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 28,
+        }}
+    >
+
+        <div>
+
+            <h2
+                style={{
+                    fontSize: 34,
+                    fontWeight: 700,
+                    marginBottom: 8,
+                }}
+            >
+                ⭐ Exclusive Coupons
+            </h2>
+
+            <p
+                style={{
+                    color: "#777",
+                    fontSize: 18,
+                }}
+            >
+                Premium coupons available only on FlyNow
+            </p>
+
+        </div>
+
+        <Link
+            to="/offers"
+            style={{
+                color: "#E4A817",
+                fontWeight: 600,
+                textDecoration: "none",
+            }}
+        >
+            View All →
+        </Link>
+
+    </div>
+
+    <div
+        style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4,1fr)",
+            gap: 24,
+        }}
+    >
+
+        {exclusiveCoupons.map((coupon) => (
+
+            <div
+                key={coupon.id}
+                style={{
+                    background: "#fff",
+                    borderRadius: 22,
+                    overflow: "hidden",
+                    boxShadow: "0 10px 30px rgba(0,0,0,.08)",
+                }}
+            >
+
+                <img
+                    src={coupon.image}
+                    alt={coupon.title}
+                    style={{
+                        width: "100%",
+                        height: 210,
+                        objectFit: "cover",
+                    }}
+                />
+
+                <div style={{ padding: 22 }}>
+
+                    <div
+                        style={{
+                            display: "inline-block",
+                            background: "#FFF4D9",
+                            color: "#D89B00",
+                            padding: "6px 14px",
+                            borderRadius: 30,
+                            fontWeight: 600,
+                            marginBottom: 14,
+                        }}
+                    >
+                        {coupon.discount}
+                    </div>
+
+                    <h3
+                        style={{
+                            fontSize: 24,
+                            marginBottom: 8,
+                        }}
+                    >
+                        {coupon.title}
+                    </h3>
+
+                    <p
+                        style={{
+                            color: "#666",
+                            marginBottom: 20,
+                        }}
+                    >
+                        {coupon.company}
+                    </p>
+
+                    <div
+                        style={{
+                            border: "2px dashed #E4A817",
+                            borderRadius: 12,
+                            padding: "12px",
+                            textAlign: "center",
+                            fontWeight: 700,
+                            color: "#D89B00",
+                            marginBottom: 18,
+                        }}
+                    >
+                        {coupon.code}
+                    </div>
+
+                    <button
+                        style={{
+                            width: "100%",
+                            background: "#E4A817",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: 14,
+                            padding: "14px",
+                            cursor: "pointer",
+                            fontWeight: 600,
+                        }}
+                    >
+                        Save to Wallet
+                    </button>
+
+                </div>
+
+            </div>
+
+        ))}
+
+    </div>
+
+</section>
+      <section
+  className="container"
+  style={{
+    padding: "70px 24px",
+  }}
+>
+  <div
+    style={{
+      textAlign: "center",
+      marginBottom: 50,
+    }}
+  >
+    <h2
+      style={{
+        fontSize: 38,
+        fontWeight: 700,
+        marginBottom: 12,
+      }}
+    >
+      🚀 How FlyNow Works
+    </h2>
+
+    <p
+      style={{
+        color: "#666",
+        fontSize: 18,
+      }}
+    >
+      Save coupons digitally and redeem them instantly at stores.
+    </p>
+  </div>
+
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(6,1fr)",
+      gap: 22,
+    }}
+  >
+    {steps.map((step, index) => (
+      <div
+        key={index}
+        style={{
+          background: "#fff",
+          borderRadius: 22,
+          padding: "28px 18px",
+          textAlign: "center",
+          boxShadow: "0 10px 30px rgba(0,0,0,.08)",
+          position: "relative",
+        }}
+      >
+        <div
+          style={{
+            width: 75,
+            height: 75,
+            borderRadius: "50%",
+            background: "#FFF6DD",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 34,
+            margin: "0 auto 18px",
+          }}
+        >
+          {step.icon}
+        </div>
+
+        <h3
+          style={{
+            fontSize: 20,
+            fontWeight: 700,
+            marginBottom: 10,
+          }}
+        >
+          {step.title}
+        </h3>
+
+        <p
+          style={{
+            color: "#777",
+            fontSize: 15,
+            lineHeight: 1.6,
+          }}
+        >
+          {step.desc}
+        </p>
+
+        {index !== steps.length - 1 && (
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              right: "-14px",
+              fontSize: 24,
+              color: "#E4A817",
+              transform: "translateY(-50%)",
+            }}
+          >
+            →
           </div>
         )}
-      </section>
-
-      {/* Trending Companies */}
-      <section className="container" style={{ padding: '0 24px 56px' }}>
-        <div className="flex items-center justify-between mb-24">
-          <div><h2 style={{ fontSize: 28 }}>Trending Companies</h2><p className="text-muted mt-8">Most popular brands</p></div>
-        </div>
-        <div className="grid grid-3">
-          {trending.map((co) => (
-            <div key={co.id} className="card card-hover card-body flex items-center gap-16">
-              {co.logo_url ? <img src={co.logo_url} style={{ width: 56, height: 56, borderRadius: 14, objectFit: 'cover' }} />
-                : <div className="stat-icon" style={{ width: 56, height: 56, background: 'var(--primary-50)', color: 'var(--primary-dark)', fontSize: 22, borderRadius: 14 }}>{co.name[0]}</div>}
-              <div style={{ flex: 1 }}>
-                <h4 style={{ fontSize: 16 }}>{co.name}</h4>
-                <p className="text-xs text-muted" style={{ display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{co.description}</p>
-                <span className="badge badge-primary mt-8"><TrendingUp size={12} /> Trending</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Flash Sales */}
-      {flash.length > 0 && (
-        <section style={{ background: 'linear-gradient(135deg, #2E2E2E, #1a1a1a)', color: '#fff', padding: '56px 0' }}>
-          <div className="container">
-            <div className="flex items-center gap-12 mb-24"><Zap size={24} style={{ color: 'var(--primary)' }} /><h2 style={{ color: '#fff', fontSize: 28 }}>Flash Sales</h2></div>
-            <div className="grid grid-4">
-              {flash.map((c) => (
-                <div key={c.id} className="card card-hover" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }} onClick={() => navigate(`/coupons/${c.id}`)}>
-                  <img src={c.flyer_image_url} style={{ width: '100%', height: 140, objectFit: 'cover' }} />
-                  <div className="card-body-sm">
-                    <div className="badge badge-warning" style={{ marginBottom: 8 }}>Ends {formatDate(c.expiry_date)}</div>
-                    <h4 style={{ color: '#fff', fontSize: 15 }}>{c.title}</h4>
-                    <p style={{ color: '#ccc', fontSize: 13, marginBottom: 4 }}>{c.discount}</p>
-                    {c.retail_price !== undefined && c.retail_price !== null && (
-                      <div className="flex items-center gap-8 mt-4" style={{ fontSize: 13 }}>
-                        {c.discount_price !== undefined && c.discount_price !== null ? (
-                          <>
-                            <span style={{ fontWeight: 700, color: 'var(--primary)' }}>
-                              ${Number(c.discount_price).toFixed(2)}
-                            </span>
-                            <span style={{ textDecoration: 'line-through', color: '#aaa', fontSize: 11 }}>
-                              ${Number(c.retail_price).toFixed(2)}
-                            </span>
-                          </>
-                        ) : (
-                          <span style={{ fontWeight: 700, color: '#fff' }}>
-                            ${Number(c.retail_price).toFixed(2)}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Latest Flyers */}
-      <section className="container" style={{ padding: '56px 24px' }}>
-        <div className="flex items-center justify-between mb-24">
-          <div><h2 style={{ fontSize: 28 }}>Latest Flyers</h2><p className="text-muted mt-8">Fresh off the press</p></div>
-          <Link to="/offers" className="btn btn-ghost btn-sm">See all <ArrowRight size={16} /></Link>
-        </div>
-        <div className="grid grid-3">
-          {latest.map((c) => (
-            <div key={c.id} className="card card-hover" onClick={() => navigate(`/coupons/${c.id}`)}>
-              <img src={c.flyer_image_url} style={{ width: '100%', height: 180, objectFit: 'cover' }} />
-              <div className="card-body-sm">
-                <span className="badge badge-primary">{c.discount}</span>
-                <h4 style={{ fontSize: 15, marginTop: 8 }}>{c.title}</h4>
-                {c.retail_price !== undefined && c.retail_price !== null && (
-                  <div className="flex items-center gap-8 mt-4" style={{ fontSize: 13 }}>
-                    {c.discount_price !== undefined && c.discount_price !== null ? (
-                      <>
-                        <span style={{ fontWeight: 700, color: 'var(--primary-dark)' }}>
-                          ${Number(c.discount_price).toFixed(2)}
-                        </span>
-                        <span style={{ textDecoration: 'line-through', color: 'var(--text-muted)', fontSize: 11 }}>
-                          ${Number(c.retail_price).toFixed(2)}
-                        </span>
-                      </>
-                    ) : (
-                      <span style={{ fontWeight: 700, color: 'var(--text-main)' }}>
-                        ${Number(c.retail_price).toFixed(2)}
-                      </span>
-                    )}
-                  </div>
-                )}
-                <p className="text-xs text-muted mt-8">{c.company?.name}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section style={{ background: 'var(--primary-50)', padding: '56px 0' }}>
-        <div className="container">
-          <h2 style={{ fontSize: 28, textAlign: 'center', marginBottom: 32 }}>What Our Users Say</h2>
-          <div className="grid grid-3">
-            {[
-              { n: 'Sarah M.', r: 'Shopper', t: 'FlyNow saved me hundreds on my weekly groceries. The coupons are always valid and easy to redeem.' },
-              { n: 'James K.', r: 'Deal Hunter', t: 'Best coupon app I have used. Clean interface, real offers, and I love the flash sales section.' },
-              { n: 'Priya L.', r: 'Mom of 3', t: 'I find offers for every category my family needs. The save feature keeps everything organized.' },
-            ].map((tm) => (
-              <div key={tm.n} className="card card-body">
-                <Quote size={28} style={{ color: 'var(--primary)', opacity: 0.4 }} />
-                <p style={{ marginTop: 12, fontSize: 15, lineHeight: 1.6 }}>{tm.t}</p>
-                <div className="flex items-center gap-12 mt-16">
-                  <div className="stat-icon" style={{ width: 40, height: 40, background: 'var(--primary)', color: '#fff', borderRadius: '50%' }}>{tm.n[0]}</div>
-                  <div><div className="font-semibold">{tm.n}</div><div className="text-xs text-muted">{tm.r}</div></div>
-                  <div className="flex" style={{ marginLeft: 'auto', color: 'var(--primary)' }}>{Array.from({length:5}).map((_,i)=><Star key={i} size={14} fill="currentColor" />)}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Newsletter */}
-      <section className="container" style={{ padding: '56px 24px' }}>
-        <div className="card" style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))', color: '#fff', padding: 48, textAlign: 'center' }}>
-          <h2 style={{ color: '#fff', fontSize: 28 }}>Never Miss a Deal</h2>
-          <p style={{ color: 'rgba(255,255,255,0.9)', marginTop: 8 }}>Subscribe to get the hottest coupons delivered to your inbox weekly.</p>
-          <div className="flex items-center gap-8" style={{ maxWidth: 480, margin: '24px auto 0' }}>
-            <input className="input" placeholder="Enter your email" style={{ background: 'rgba(255,255,255,0.95)' }} />
-            <button className="btn" style={{ background: 'var(--text)', color: '#fff' }}>Subscribe</button>
-          </div>
-        </div>
-      </section>
+      </div>
+    ))}
+  </div>
+</section>
     </div>
   );
 }
