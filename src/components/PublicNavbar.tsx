@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Tag, Menu, Search, User, LogOut, LayoutDashboard, Bookmark } from 'lucide-react';
+import { Tag, Search, User, LogOut, LayoutDashboard, Bookmark } from 'lucide-react';
 import { useAuth } from '../lib/auth-context';
 
 export default function PublicNavbar() {
   const { profile, signOut } = useAuth();
-  const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState(false);
   const navigate = useNavigate();
 
@@ -52,31 +51,16 @@ export default function PublicNavbar() {
               )}
             </div>
           ) : (
-            <div className="flex items-center gap-8 hide-mobile">
-              <Link to="/login" className="btn btn-secondary btn-sm">User</Link>
-              <Link to="/company/login" className="btn btn-secondary btn-sm" style={{ color: '#5B5FEF' }}>Company</Link>
-              <Link to="/admin/login" className="btn btn-secondary btn-sm" style={{ color: '#2E2E2E' }}>Admin</Link>
-            </div>
+<div className="hide-mobile">
+  <Link to="/login" className="btn btn-primary btn-sm">
+    Sign In
+  </Link>
+</div>
           )}
-          <button className="btn-icon btn-secondary" onClick={() => setOpen(!open)} style={{ display: 'block' }}><Menu size={20} /></button>
         </div>
       </div>
 
-      {open && (
-        <div className="card" style={{ position: 'fixed', top: 68, left: 12, right: 12, zIndex: 50, padding: 16 }}>
-          <div className="flex-col gap-8">
-            {links.map((l) => <Link key={l.to} to={l.to} className="sidebar-link" onClick={() => setOpen(false)}>{l.label}</Link>)}
-            {!profile && (
-              <div className="flex-col gap-8">
-                <Link to="/login" className="btn btn-primary" onClick={() => setOpen(false)}>User Sign In</Link>
-                <Link to="/company/login" className="btn btn-secondary" onClick={() => setOpen(false)} style={{ color: '#5B5FEF' }}>Company Sign In</Link>
-                <Link to="/admin/login" className="btn btn-secondary" onClick={() => setOpen(false)} style={{ color: '#2E2E2E' }}>Admin Sign In</Link>
-              </div>
-            )}
-            {profile && <Link to="/profile" className="sidebar-link" onClick={() => setOpen(false)}>Profile</Link>}
-          </div>
-        </div>
-      )}
+
     </header>
   );
 }

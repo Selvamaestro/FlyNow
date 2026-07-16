@@ -26,60 +26,311 @@ export default function LandingPage() {
   return (
     <div>
       {/* Hero */}
-      <section style={{ background: 'linear-gradient(135deg, var(--primary-50) 0%, var(--bg) 60%)', padding: '64px 0 72px', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: -80, right: -80, width: 320, height: 320, borderRadius: '50%', background: 'radial-gradient(circle, rgba(244,176,0,0.18), transparent 70%)' }} />
-        <div className="container" style={{ position: 'relative' }}>
-          <div style={{ maxWidth: 720, margin: '0 auto', textAlign: 'center' }}>
-            <span className="badge badge-primary" style={{ marginBottom: 20, padding: '6px 16px' }}>
-              <Zap size={14} /> Premium Digital Coupons
-            </span>
-            <h1 style={{ fontSize: 'clamp(36px, 5vw, 56px)', lineHeight: 1.1, marginBottom: 16 }}>
-              Discover & Redeem Exclusive <span style={{ color: 'var(--primary-dark)' }}>Flyer Coupons</span> From Top Brands
-            </h1>
-            <p className="text-lg text-muted" style={{ marginBottom: 32 }}>
-              Browse thousands of verified offers, save your favorites, and redeem in-store or online — all in one premium platform.
+<section
+  style={{
+    background:
+      "radial-gradient(circle at top right,#FFF2C7 0%,#FFF8EA 30%,#ffffff 75%)",
+    padding: "70px 0 90px",
+    overflow: "hidden",
+  }}
+>
+  <div
+    className="container"
+    style={{
+      display: "grid",
+      gridTemplateColumns: "1.1fr 0.9fr",
+      alignItems: "center",
+      gap: "60px",
+    }}
+  >
+    {/* LEFT CONTENT */}
+
+    <div>
+
+      <div
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "8px",
+          background: "#FFF4D8",
+          color: "#D89B17",
+          padding: "8px 18px",
+          borderRadius: "30px",
+          fontWeight: 600,
+          marginBottom: "25px",
+        }}
+      >
+        ⚡ Premium Digital Coupons
+      </div>
+
+      <h1
+        style={{
+          fontSize: "65px",
+          lineHeight: "1.05",
+          fontWeight: 800,
+          color: "#222",
+          marginBottom: "25px",
+        }}
+      >
+        Discover & Redeem
+        <br />
+        Exclusive
+        <span style={{ color: "#D89B17" }}> Flyer Coupons</span>
+        <br />
+        From Top Brands
+      </h1>
+
+      <p
+        style={{
+          fontSize: "20px",
+          color: "#666",
+          maxWidth: "650px",
+          lineHeight: "1.7",
+          marginBottom: "40px",
+        }}
+      >
+        Browse thousands of verified offers, save your favorite
+        coupons, and redeem them online or in-store — all in one
+        premium platform.
+      </p>
+
+      {/* SEARCH */}
+
+      <div
+        style={{
+          display: "flex",
+          background: "#fff",
+          borderRadius: "60px",
+          overflow: "hidden",
+          boxShadow: "0 20px 50px rgba(0,0,0,.08)",
+          maxWidth: "700px",
+        }}
+      >
+        <input
+          type="text"
+          placeholder="Search brands, categories or offers..."
+          style={{
+            flex: 1,
+            border: "none",
+            outline: "none",
+            padding: "22px 28px",
+            fontSize: "17px",
+          }}
+        />
+
+        <button
+          style={{
+            background: "#E4A817",
+            color: "#fff",
+            border: "none",
+            width: "170px",
+            fontWeight: 700,
+            fontSize: "18px",
+            cursor: "pointer",
+          }}
+        >
+          Search
+        </button>
+      </div>
+
+      {/* STATS */}
+
+      <div
+        style={{
+          display: "flex",
+          gap: "55px",
+          marginTop: "55px",
+        }}
+      >
+        {[
+          ["12k+", "Active Coupons"],
+          ["850+", "Top Brands"],
+          ["2.4M", "Happy Users"],
+          ["98%", "Satisfaction"],
+        ].map(([num, text]) => (
+          <div key={num}>
+            <h2
+              style={{
+                color: "#D89B17",
+                fontSize: "42px",
+                marginBottom: "5px",
+                fontWeight: 800,
+              }}
+            >
+              {num}
+            </h2>
+
+            <p
+              style={{
+                color: "#666",
+                fontSize: "15px",
+              }}
+            >
+              {text}
             </p>
-            <div className="flex items-center gap-8" style={{ maxWidth: 560, margin: '0 auto', background: 'var(--surface)', borderRadius: 999, padding: 8, boxShadow: 'var(--shadow-lg)', border: '1px solid var(--border)' }}>
-              <Search size={20} style={{ color: 'var(--text-muted)', marginLeft: 16 }} />
-              <input className="input" value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} placeholder="Search brands, categories, or offers..." style={{ border: 'none', boxShadow: 'none', background: 'transparent', flex: 1 }} />
-              <button className="btn btn-primary" onClick={search}>Search</button>
-            </div>
-            <div className="flex items-center justify-center gap-32 mt-32 wrap">
-              {[['12k+','Active Coupons'],['850+','Top Brands'],['2.4M','Happy Users'],['98%','Satisfaction']].map(([n,l]) => (
-                <div key={l} className="text-center">
-                  <div style={{ fontFamily: 'var(--font-head)', fontWeight: 800, fontSize: 28, color: 'var(--primary-dark)' }}>{n}</div>
-                  <div className="text-sm text-muted">{l}</div>
-                </div>
-              ))}
-            </div>
           </div>
-        </div>
-      </section>
+        ))}
+      </div>
+    </div>
+
+    {/* RIGHT IMAGE */}
+
+    <div
+      style={{
+        position: "relative",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          width: "520px",
+          height: "520px",
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle,#FFD768 0%,rgba(255,215,104,.15) 70%,transparent 100%)",
+          filter: "blur(15px)",
+          left: "50%",
+          top: "50%",
+          transform: "translate(-50%,-50%)",
+          zIndex: 0,
+        }}
+      />
+
+      <img
+        src="/images/image.png"
+        alt="Hero"
+        style={{
+         width:"650px",
+         maxWidth:"100%",
+         display:"block",
+         margin:"auto",
+          position: "relative",
+          zIndex: 2,
+        }}
+      />
+    </div>
+  </div>
+</section>
 
       {/* Categories */}
-      <section className="container" style={{ padding: '56px 24px' }}>
-        <div className="flex items-center justify-between mb-24">
-          <div><h2 style={{ fontSize: 28 }}>Browse Categories</h2><p className="text-muted mt-8">Find offers by category</p></div>
-          <Link to="/categories" className="btn btn-ghost btn-sm">View all <ArrowRight size={16} /></Link>
-        </div>
-        <div className="grid grid-4">
-          {(categories ?? []).slice(0, 8).map((c) => {
-            const Icon = getCategoryIcon(c.icon);
-            return (
-              <Link key={c.id} to={`/categories/${c.slug}`} className="card card-hover" style={{ overflow: 'hidden' }}>
-                <div style={{ height: 72, background: categoryGradient(c.color), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Icon size={28} color="#fff" />
-                </div>
-                <div className="card-body-sm">
-                  <div className="font-semibold">{c.name}</div>
-                  <div className="text-xs text-muted">Explore offers</div>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
+<section className="container" style={{ padding: "70px 24px" }}>
+  <div
+    className="flex items-center justify-between"
+    style={{ marginBottom: 32 }}
+  >
+    <div>
+      <h2 style={{ fontSize: 40, fontWeight: 800 }}>
+        Browse Categories
+      </h2>
 
+      <p
+        className="text-muted"
+        style={{ marginTop: 8, fontSize: 17 }}
+      >
+        Find offers by category
+      </p>
+    </div>
+
+    <Link
+      to="/categories"
+      className="btn btn-ghost btn-sm"
+      style={{ fontWeight: 700 }}
+    >
+      View all
+      <ArrowRight size={18} />
+    </Link>
+  </div>
+
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(5, 1fr)",
+      gap: 28,
+    }}
+  >
+    {(categories ?? []).slice(0, 10).map((c) => {
+      const Icon = getCategoryIcon(c.icon);
+
+      const offerCount =
+        coupons?.filter(
+          (coupon) => coupon.category?.id === c.id
+        ).length ?? 0;
+
+      return (
+        <Link
+          key={c.id}
+          to={`/categories/${c.slug}`}
+          style={{
+            textDecoration: "none",
+            color: "inherit",
+          }}
+        >
+          <div
+            className="category-card"
+            style={{
+              background: "#fff",
+              borderRadius: 24,
+              padding: "28px 18px",
+              height: 220,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "space-between",
+              boxShadow: "0 12px 30px rgba(0,0,0,.08)",
+              transition: ".3s",
+            }}
+          >
+            <div
+              className="category-icon"
+              style={{
+                width: 82,
+                height: 82,
+                borderRadius: 22,
+                background: c.color,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Icon size={38} color="#fff" />
+            </div>
+
+            <h3
+              style={{
+                fontSize: 17,
+                fontWeight: 700,
+                textAlign: "center",
+                margin: "14px 0 6px",
+              }}
+            >
+              {c.name}
+            </h3>
+
+            <p
+              style={{
+                color: "#777",
+                fontSize: 15,
+                margin: 0,
+              }}
+            >
+              {offerCount} Offers
+            </p>
+
+            <span
+              style={{
+                color: "#D69E00",
+                fontWeight: 700,
+                marginTop: 12,
+              }}
+            >
+              Explore →
+            </span>
+          </div>
+        </Link>
+      );
+    })}
+  </div>
+</section>
       {/* Featured Coupons */}
       <section className="container" style={{ padding: '0 24px 56px' }}>
         <div className="flex items-center justify-between mb-24">

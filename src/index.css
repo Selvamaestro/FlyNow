@@ -207,3 +207,20 @@ ul { list-style: none; }
   .topbar { padding: 0 16px; }
   .hide-mobile { display: none; }
 }
+.category-card{
+    cursor:pointer;
+    transition:all .3s ease;
+}
+
+.category-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 22px 40px rgba(0,0,0,.12);
+}
+
+.category-icon{
+    transition:.3s;
+}
+
+.category-card:hover .category-icon{
+    transform:scale(1.08);
+}
