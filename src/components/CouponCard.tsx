@@ -37,6 +37,29 @@ export default function CouponCard({ coupon, saved, onToggleSave, onView, showSt
           {coupon.category && <span className="badge badge-muted" style={{ marginLeft: 'auto' }}>{coupon.category.name}</span>}
         </div>
         <h3 style={{ fontSize: 16, lineHeight: 1.3 }} className="cursor-pointer" onClick={onView}>{coupon.title}</h3>
+        {coupon.retail_price !== undefined && coupon.retail_price !== null && (
+          <div className="flex items-center gap-8 mt-4" style={{ fontSize: 14 }}>
+            {coupon.discount_price !== undefined && coupon.discount_price !== null ? (
+              <>
+                <span style={{ fontWeight: 700, color: 'var(--primary-dark)' }}>
+                  ${Number(coupon.discount_price).toFixed(2)}
+                </span>
+                <span style={{ textDecoration: 'line-through', color: 'var(--text-muted)', fontSize: 12 }}>
+                  ${Number(coupon.retail_price).toFixed(2)}
+                </span>
+                {Number(coupon.retail_price) > Number(coupon.discount_price) && (
+                  <span className="badge badge-success" style={{ padding: '2px 6px', fontSize: 10, lineHeight: 1 }}>
+                    Save ${(Number(coupon.retail_price) - Number(coupon.discount_price)).toFixed(2)}
+                  </span>
+                )}
+              </>
+            ) : (
+              <span style={{ fontWeight: 700, color: 'var(--text-main)' }}>
+                ${Number(coupon.retail_price).toFixed(2)}
+              </span>
+            )}
+          </div>
+        )}
         <p className="text-sm text-muted" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{coupon.description}</p>
         <div className="flex items-center gap-12 text-xs text-muted" style={{ marginTop: 'auto' }}>
           <span className="flex items-center gap-8"><Calendar size={13} /> {formatDate(coupon.expiry_date)}</span>

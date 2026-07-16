@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, TrendingUp, Zap, ArrowRight, Star, Quote } from 'lucide-react';
+import { TrendingUp, Zap, ArrowRight, Star, Quote } from 'lucide-react';
 import { useAsync } from '../../lib/use-async';
 import { couponService, companyService, categoryService } from '../../lib/services';
 import CouponCard from '../../components/CouponCard';
 import EmptyState from '../../components/EmptyState';
 import { PageLoader } from '../../components/Spinner';
 import { formatDate } from '../../lib/utils';
-import { getCategoryIcon, categoryGradient } from '../../lib/category-icons';
+import { getCategoryIcon } from '../../lib/category-icons';
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -109,6 +109,9 @@ export default function LandingPage() {
         <input
           type="text"
           placeholder="Search brands, categories or offers..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && search()}
           style={{
             flex: 1,
             border: "none",
@@ -119,6 +122,7 @@ export default function LandingPage() {
         />
 
         <button
+          onClick={search}
           style={{
             background: "#E4A817",
             color: "#fff",
@@ -376,7 +380,25 @@ export default function LandingPage() {
                   <div className="card-body-sm">
                     <div className="badge badge-warning" style={{ marginBottom: 8 }}>Ends {formatDate(c.expiry_date)}</div>
                     <h4 style={{ color: '#fff', fontSize: 15 }}>{c.title}</h4>
-                    <p style={{ color: '#ccc', fontSize: 13 }}>{c.discount}</p>
+                    <p style={{ color: '#ccc', fontSize: 13, marginBottom: 4 }}>{c.discount}</p>
+                    {c.retail_price !== undefined && c.retail_price !== null && (
+                      <div className="flex items-center gap-8 mt-4" style={{ fontSize: 13 }}>
+                        {c.discount_price !== undefined && c.discount_price !== null ? (
+                          <>
+                            <span style={{ fontWeight: 700, color: 'var(--primary)' }}>
+                              ${Number(c.discount_price).toFixed(2)}
+                            </span>
+                            <span style={{ textDecoration: 'line-through', color: '#aaa', fontSize: 11 }}>
+                              ${Number(c.retail_price).toFixed(2)}
+                            </span>
+                          </>
+                        ) : (
+                          <span style={{ fontWeight: 700, color: '#fff' }}>
+                            ${Number(c.retail_price).toFixed(2)}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -398,7 +420,25 @@ export default function LandingPage() {
               <div className="card-body-sm">
                 <span className="badge badge-primary">{c.discount}</span>
                 <h4 style={{ fontSize: 15, marginTop: 8 }}>{c.title}</h4>
-                <p className="text-xs text-muted">{c.company?.name}</p>
+                {c.retail_price !== undefined && c.retail_price !== null && (
+                  <div className="flex items-center gap-8 mt-4" style={{ fontSize: 13 }}>
+                    {c.discount_price !== undefined && c.discount_price !== null ? (
+                      <>
+                        <span style={{ fontWeight: 700, color: 'var(--primary-dark)' }}>
+                          ${Number(c.discount_price).toFixed(2)}
+                        </span>
+                        <span style={{ textDecoration: 'line-through', color: 'var(--text-muted)', fontSize: 11 }}>
+                          ${Number(c.retail_price).toFixed(2)}
+                        </span>
+                      </>
+                    ) : (
+                      <span style={{ fontWeight: 700, color: 'var(--text-main)' }}>
+                        ${Number(c.retail_price).toFixed(2)}
+                      </span>
+                    )}
+                  </div>
+                )}
+                <p className="text-xs text-muted mt-8">{c.company?.name}</p>
               </div>
             </div>
           ))}
