@@ -50,8 +50,11 @@ export interface Coupon {
   expiry_date: string;
   status: CouponStatus;
   views: number;
+  retail_price?: number | null;
+  discount_price?: number | null;
   created_at: string;
   // joined fields
+
   company?: Pick<Company, 'id' | 'name' | 'logo_url' | 'description' | 'contact_email' | 'phone' | 'website'>;
   category?: Pick<Category, 'id' | 'name' | 'slug' | 'color' | 'icon'> | null;
 }

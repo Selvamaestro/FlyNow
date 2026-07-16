@@ -16,9 +16,47 @@ export default function UploadFlyerPage() {
   const { data: categories } = useAsync(() => categoryService.list(), []);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState('');
-  const [form, setForm] = useState({ title: '', description: '', category_id: '', discount: '', coupon_code: '', terms: '', expiry_date: '' });
+  const [form, setForm] = useState({
+    title: '',
+    description: '',
+    category_id: '',
+    discount: '',
+    coupon_code: '',
+    terms: '',
+    expiry_date: '',
+    retail_price: '',
+    discount_price: '',
+  });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+
+  const calculateDiscountedPrice = (retailVal: string, discountVal: string) => {
+    const retail = parseFloat(retailVal);
+    if (isNaN(retail) || retail <= 0) return '';
+    const pctMatch = discountVal.match(/(\d+(?:\.\d+)?)\s*%/);
+    if (pctMatch) {
+      const pct = parseFloat(pctMatch[1]);
+      return (retail * (1 - pct / 100)).toFixed(2);
+    }
+    const valMatch = discountVal.match(/(?:\$|usd)?\s*(\d+(?:\.\d+)?)/i);
+    if (valMatch && !discountVal.includes('%')) {
+      const amt = parseFloat(valMatch[1]);
+      if (amt < retail) {
+        return (retail - amt).toFixed(2);
+      }
+    }
+    return '';
+  };
+
+  const handleRetailPriceChange = (val: string) => {
+    const calculated = calculateDiscountedPrice(val, form.discount);
+    setForm({ ...form, retail_price: val, discount_price: calculated || form.discount_price });
+  };
+
+  const handleDiscountChange = (val: string) => {
+    const calculated = calculateDiscountedPrice(form.retail_price, val);
+    setForm({ ...form, discount: val, discount_price: calculated || form.discount_price });
+  };
 
   const onFile = (f: File | null) => {
     if (!f) return;
@@ -57,6 +95,8 @@ export default function UploadFlyerPage() {
         coupon_code: form.coupon_code,
         terms: form.terms,
         expiry_date: form.expiry_date,
+        retail_price: form.retail_price ? parseFloat(form.retail_price) : null,
+        discount_price: form.discount_price ? parseFloat(form.discount_price) : null,
       });
       await notificationService.create({ type: 'coupon_submission', title: 'New coupon submission', message: `${company.name} submitted "${form.title}" for review.`, target_role: 'admin', ref_id: company.id });
       show('Flyer uploaded! Status: Pending', 'success');
@@ -90,7 +130,11 @@ export default function UploadFlyerPage() {
           <div className="field"><label className="label">Description</label><textarea className="textarea" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
           <div className="grid grid-2" style={{ gap: 12 }}>
             <div className="field"><label className="label">Category</label><select className="select" value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })}><option value="">Select</option>{(categories ?? []).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
-            <div className="field"><label className="label">Discount *</label><input className="input" placeholder="e.g. 25% OFF" value={form.discount} onChange={(e) => setForm({ ...form, discount: e.target.value })} />{errors.discount && <div className="field-error">{errors.discount}</div>}</div>
+            <div className="field"><label className="label">Discount *</label><input className="input" placeholder="e.g. 25% OFF" value={form.discount} onChange={(e) => handleDiscountChange(e.target.value)} />{errors.discount && <div className="field-error">{errors.discount}</div>}</div>
+          </div>
+          <div className="grid grid-2" style={{ gap: 12 }}>
+            <div className="field"><label className="label">Retail Price ($)</label><input type="number" step="0.01" min="0" className="input" placeholder="e.g. 99.99" value={form.retail_price} onChange={(e) => handleRetailPriceChange(e.target.value)} /></div>
+            <div className="field"><label className="label">Discounted Price ($)</label><input type="number" step="0.01" min="0" className="input" placeholder="e.g. 74.99" value={form.discount_price} onChange={(e) => setForm({ ...form, discount_price: e.target.value })} /></div>
           </div>
           <div className="grid grid-2" style={{ gap: 12 }}>
             <div className="field"><label className="label">Coupon Code *</label><input className="input" value={form.coupon_code} onChange={(e) => setForm({ ...form, coupon_code: e.target.value.toUpperCase() })} />{errors.coupon_code && <div className="field-error">{errors.coupon_code}</div>}</div>
