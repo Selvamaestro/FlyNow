@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, TrendingUp, Zap, ArrowRight, Star, Quote } from 'lucide-react';
+import { TrendingUp, Zap, ArrowRight, Star, Quote } from 'lucide-react';
 import { useAsync } from '../../lib/use-async';
 import { couponService, companyService, categoryService } from '../../lib/services';
 import CouponCard from '../../components/CouponCard';
 import EmptyState from '../../components/EmptyState';
 import { PageLoader } from '../../components/Spinner';
 import { formatDate } from '../../lib/utils';
-import { getCategoryIcon, categoryGradient } from '../../lib/category-icons';
+import { getCategoryIcon } from '../../lib/category-icons';
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -208,6 +208,9 @@ const steps = [
         <input
           type="text"
           placeholder="Search brands, categories or offers..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && search()}
           style={{
             flex: 1,
             border: "none",
@@ -218,6 +221,7 @@ const steps = [
         />
 
         <button
+          onClick={search}
           style={{
             background: "#E4A817",
             color: "#fff",

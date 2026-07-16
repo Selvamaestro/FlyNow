@@ -68,6 +68,29 @@ export default function CouponDetailPage() {
           </div>
           <h1 style={{ fontSize: 28 }}>{coupon.title}</h1>
           <div className="badge badge-primary" style={{ fontSize: 16, padding: '8px 16px', marginTop: 12 }}>{coupon.discount}</div>
+          {coupon.retail_price !== undefined && coupon.retail_price !== null && (
+            <div className="flex items-center gap-12 mt-16" style={{ fontSize: 20 }}>
+              {coupon.discount_price !== undefined && coupon.discount_price !== null ? (
+                <>
+                  <span style={{ fontWeight: 800, color: 'var(--primary-dark)', fontSize: 24 }}>
+                    ${Number(coupon.discount_price).toFixed(2)}
+                  </span>
+                  <span style={{ textDecoration: 'line-through', color: 'var(--text-muted)', fontSize: 16 }}>
+                    ${Number(coupon.retail_price).toFixed(2)}
+                  </span>
+                  {Number(coupon.retail_price) > Number(coupon.discount_price) && (
+                    <span className="badge badge-success" style={{ padding: '4px 10px', fontSize: 12 }}>
+                      Save ${(Number(coupon.retail_price) - Number(coupon.discount_price)).toFixed(2)}
+                    </span>
+                  )}
+                </>
+              ) : (
+                <span style={{ fontWeight: 800, color: 'var(--text-main)', fontSize: 24 }}>
+                  ${Number(coupon.retail_price).toFixed(2)}
+                </span>
+              )}
+            </div>
+          )}
           <p className="text-muted mt-16" style={{ lineHeight: 1.7 }}>{coupon.description}</p>
 
           <div className="card card-body mt-24" style={{ background: 'var(--primary-50)', borderColor: 'var(--primary)' }}>
