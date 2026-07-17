@@ -15,9 +15,9 @@ import type { Company } from '../../lib/types';
 const getFallbackEmail = (displayName: string) => {
   if (!displayName) return '';
   const name = displayName.trim();
-  
+
   if (name === 'FlyNow Admin') return 'admin@flynow.com';
-  if (name === 'Sarah Mitchell') return 'user@flynow.com';
+  if (name === 'Aswin') return 'user@flynow.com';
   if (name === 'TechNova Electronics') return 'company@flynow.com';
   if (name === 'BloomHome Decor') return 'company1@flynow.com';
   if (name === 'TinyTreasures Baby') return 'company2@flynow.com';
@@ -27,14 +27,14 @@ const getFallbackEmail = (displayName: string) => {
   if (name === 'GlowPure Skincare') return 'company6@flynow.com';
   if (name === 'FreshCart Grocery') return 'company7@flynow.com';
   if (name === 'ProAthlete Sports') return 'company8@flynow.com';
-  
+
   return `${name.toLowerCase().replace(/[^a-z0-9]/g, '')}@flynow.com`;
 };
 
 export default function UsersPage() {
   const { show } = useToast();
   const [activeTab, setActiveTab] = useState<'companies' | 'users'>('companies');
-  
+
   // Fetch users and companies
   const { data: users, loading: usersLoading, reload: reloadUsers } = useAsync(() => userService.list(), []);
   const { data: companies, loading: companiesLoading, reload: reloadCompanies } = useAsync(() => companyService.listAll(), []);
@@ -52,51 +52,51 @@ export default function UsersPage() {
   const setCompanyStatus = async (c: Company, status: 'approved' | 'suspended' | 'pending') => {
     try {
       await companyService.update(c.id, { status });
-      await notificationService.create({ 
-        type: status === 'approved' ? 'company_approval' : 'company_status', 
-        title: `Company ${status}`, 
-        message: `${c.name} is now ${status}.`, 
-        target_role: 'all', 
-        ref_id: c.id 
+      await notificationService.create({
+        type: status === 'approved' ? 'company_approval' : 'company_status',
+        title: `Company ${status}`,
+        message: `${c.name} is now ${status}.`,
+        target_role: 'all',
+        ref_id: c.id
       });
-      show(`Company ${status}`, 'success'); 
+      show(`Company ${status}`, 'success');
       reloadCompanies();
-    } catch (e) { 
-      show((e as Error).message, 'error'); 
+    } catch (e) {
+      show((e as Error).message, 'error');
     }
   };
 
   const deleteCompany = async () => {
     if (!toDeleteCompany) return;
-    try { 
-      await companyService.remove(toDeleteCompany); 
-      show('Company deleted', 'success'); 
-      reloadCompanies(); 
-    } catch (e) { 
-      show((e as Error).message, 'error'); 
+    try {
+      await companyService.remove(toDeleteCompany);
+      show('Company deleted', 'success');
+      reloadCompanies();
+    } catch (e) {
+      show((e as Error).message, 'error');
     }
     setToDeleteCompany(null);
   };
 
   // Actions for Users
   const setUserStatus = async (id: string, status: 'active' | 'suspended') => {
-    try { 
-      await userService.updateStatus(id, status); 
-      show(`User account ${status}`, 'success'); 
-      reloadUsers(); 
-    } catch (e) { 
-      show((e as Error).message, 'error'); 
+    try {
+      await userService.updateStatus(id, status);
+      show(`User account ${status}`, 'success');
+      reloadUsers();
+    } catch (e) {
+      show((e as Error).message, 'error');
     }
   };
 
   const deleteUser = async () => {
     if (!toDeleteUser) return;
-    try { 
-      await userService.remove(toDeleteUser); 
-      show('User account deleted', 'success'); 
-      reloadUsers(); 
-    } catch (e) { 
-      show((e as Error).message, 'error'); 
+    try {
+      await userService.remove(toDeleteUser);
+      show('User account deleted', 'success');
+      reloadUsers();
+    } catch (e) {
+      show((e as Error).message, 'error');
     }
     setToDeleteUser(null);
   };
@@ -118,12 +118,12 @@ export default function UsersPage() {
 
       {/* Tabs */}
       <div className="flex gap-24 mb-24" style={{ borderBottom: '1px solid var(--border)', paddingBottom: 0 }}>
-        <button 
+        <button
           className={`pb-12 font-semibold text-lg relative`}
           onClick={() => setActiveTab('companies')}
-          style={{ 
-            background: 'none', 
-            border: 'none', 
+          style={{
+            background: 'none',
+            border: 'none',
             cursor: 'pointer',
             paddingBottom: '12px',
             color: activeTab === 'companies' ? 'var(--primary-dark)' : 'var(--text-muted)',
@@ -136,12 +136,12 @@ export default function UsersPage() {
             <div style={{ position: 'absolute', bottom: -1, left: 0, right: 0, height: 3, background: 'var(--primary)', borderRadius: '3px 3px 0 0' }} />
           )}
         </button>
-        <button 
+        <button
           className={`pb-12 font-semibold text-lg relative`}
           onClick={() => setActiveTab('users')}
-          style={{ 
-            background: 'none', 
-            border: 'none', 
+          style={{
+            background: 'none',
+            border: 'none',
             cursor: 'pointer',
             paddingBottom: '12px',
             color: activeTab === 'users' ? 'var(--primary-dark)' : 'var(--text-muted)',
@@ -161,10 +161,10 @@ export default function UsersPage() {
         {activeTab === 'companies' ? (
           <div className="flex items-center gap-8">
             {['all', 'pending', 'approved', 'suspended'].map((f) => (
-              <button 
-                key={f} 
-                className={`btn btn-sm ${companyFilter === f ? 'btn-primary' : 'btn-secondary'}`} 
-                onClick={() => setCompanyFilter(f)} 
+              <button
+                key={f}
+                className={`btn btn-sm ${companyFilter === f ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => setCompanyFilter(f)}
                 style={{ textTransform: 'capitalize' }}
               >
                 {f}
@@ -174,10 +174,10 @@ export default function UsersPage() {
         ) : (
           <div className="flex items-center gap-8">
             {['all', 'user', 'company', 'admin'].map((f) => (
-              <button 
-                key={f} 
-                className={`btn btn-sm ${userFilter === f ? 'btn-primary' : 'btn-secondary'}`} 
-                onClick={() => setUserFilter(f)} 
+              <button
+                key={f}
+                className={`btn btn-sm ${userFilter === f ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => setUserFilter(f)}
                 style={{ textTransform: 'capitalize' }}
               >
                 {f}
@@ -245,68 +245,68 @@ export default function UsersPage() {
                     </td>
                     <td>
                       <div className="flex items-center gap-8">
-                        <button 
-                          className="btn-icon btn-secondary" 
-                          onClick={() => setViewingCompany(c)} 
+                        <button
+                          className="btn-icon btn-secondary"
+                          onClick={() => setViewingCompany(c)}
                           title="View Details"
                           style={{ width: 30, height: 30, borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
                         >
                           <Eye size={14} />
                         </button>
-                        <button 
-                          disabled={c.status === 'approved'} 
-                          onClick={() => setCompanyStatus(c, 'approved')} 
+                        <button
+                          disabled={c.status === 'approved'}
+                          onClick={() => setCompanyStatus(c, 'approved')}
                           title="Approve Company"
-                          style={{ 
-                            background: c.status === 'approved' ? 'var(--border)' : '#22c55e', 
-                            color: '#fff', 
-                            border: 'none', 
-                            cursor: c.status === 'approved' ? 'not-allowed' : 'pointer', 
-                            width: 30, 
-                            height: 30, 
-                            borderRadius: '50%', 
-                            display: 'inline-flex', 
-                            alignItems: 'center', 
+                          style={{
+                            background: c.status === 'approved' ? 'var(--border)' : '#22c55e',
+                            color: '#fff',
+                            border: 'none',
+                            cursor: c.status === 'approved' ? 'not-allowed' : 'pointer',
+                            width: 30,
+                            height: 30,
+                            borderRadius: '50%',
+                            display: 'inline-flex',
+                            alignItems: 'center',
                             justifyContent: 'center',
                             opacity: c.status === 'approved' ? 0.5 : 1
                           }}
                         >
                           <CheckCircle size={14} />
                         </button>
-                        <button 
-                          disabled={c.status === 'suspended'} 
-                          onClick={() => setCompanyStatus(c, 'suspended')} 
+                        <button
+                          disabled={c.status === 'suspended'}
+                          onClick={() => setCompanyStatus(c, 'suspended')}
                           title="Suspend Company"
-                          style={{ 
-                            background: c.status === 'suspended' ? 'var(--border)' : 'var(--surface-dark)', 
-                            color: 'var(--text-main)', 
-                            border: '1px solid var(--border)', 
-                            cursor: c.status === 'suspended' ? 'not-allowed' : 'pointer', 
-                            width: 30, 
-                            height: 30, 
-                            borderRadius: '50%', 
-                            display: 'inline-flex', 
-                            alignItems: 'center', 
+                          style={{
+                            background: c.status === 'suspended' ? 'var(--border)' : 'var(--surface-dark)',
+                            color: 'var(--text-main)',
+                            border: '1px solid var(--border)',
+                            cursor: c.status === 'suspended' ? 'not-allowed' : 'pointer',
+                            width: 30,
+                            height: 30,
+                            borderRadius: '50%',
+                            display: 'inline-flex',
+                            alignItems: 'center',
                             justifyContent: 'center',
                             opacity: c.status === 'suspended' ? 0.5 : 1
                           }}
                         >
                           <Ban size={14} />
                         </button>
-                        <button 
-                          onClick={() => setToDeleteCompany(c.id)} 
+                        <button
+                          onClick={() => setToDeleteCompany(c.id)}
                           title="Delete Company"
-                          style={{ 
-                            background: '#ef4444', 
-                            color: '#fff', 
-                            border: 'none', 
-                            cursor: 'pointer', 
-                            width: 30, 
-                            height: 30, 
-                            borderRadius: '50%', 
-                            display: 'inline-flex', 
-                            alignItems: 'center', 
-                            justifyContent: 'center' 
+                          style={{
+                            background: '#ef4444',
+                            color: '#fff',
+                            border: 'none',
+                            cursor: 'pointer',
+                            width: 30,
+                            height: 30,
+                            borderRadius: '50%',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
                           }}
                         >
                           <Trash2 size={14} />
@@ -359,51 +359,51 @@ export default function UsersPage() {
                   </td>
                   <td>
                     <div className="flex items-center gap-8">
-                      <button 
-                        className="btn-icon btn-secondary" 
-                        disabled={u.status === 'suspended'} 
-                        onClick={() => setUserStatus(u.id, 'suspended')} 
+                      <button
+                        className="btn-icon btn-secondary"
+                        disabled={u.status === 'suspended'}
+                        onClick={() => setUserStatus(u.id, 'suspended')}
                         title="Suspend User"
                         style={{ width: 30, height: 30, borderRadius: '50%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
                       >
                         <Ban size={14} />
                       </button>
-                      <button 
-                        className="btn-icon btn-success" 
-                        disabled={u.status === 'active'} 
-                        onClick={() => setUserStatus(u.id, 'active')} 
+                      <button
+                        className="btn-icon btn-success"
+                        disabled={u.status === 'active'}
+                        onClick={() => setUserStatus(u.id, 'active')}
                         title="Activate User"
-                        style={{ 
-                          background: u.status === 'active' ? 'var(--border)' : '#22c55e', 
-                          color: '#fff', 
-                          border: 'none', 
-                          cursor: u.status === 'active' ? 'not-allowed' : 'pointer', 
-                          width: 30, 
-                          height: 30, 
-                          borderRadius: '50%', 
-                          display: 'inline-flex', 
-                          alignItems: 'center', 
+                        style={{
+                          background: u.status === 'active' ? 'var(--border)' : '#22c55e',
+                          color: '#fff',
+                          border: 'none',
+                          cursor: u.status === 'active' ? 'not-allowed' : 'pointer',
+                          width: 30,
+                          height: 30,
+                          borderRadius: '50%',
+                          display: 'inline-flex',
+                          alignItems: 'center',
                           justifyContent: 'center',
                           opacity: u.status === 'active' ? 0.5 : 1
                         }}
                       >
                         <CheckCircle size={14} />
                       </button>
-                      <button 
-                        className="btn-icon btn-danger" 
-                        onClick={() => setToDeleteUser(u.id)} 
+                      <button
+                        className="btn-icon btn-danger"
+                        onClick={() => setToDeleteUser(u.id)}
                         title="Delete User"
-                        style={{ 
-                          background: '#ef4444', 
-                          color: '#fff', 
-                          border: 'none', 
-                          cursor: 'pointer', 
-                          width: 30, 
-                          height: 30, 
-                          borderRadius: '50%', 
-                          display: 'inline-flex', 
-                          alignItems: 'center', 
-                          justifyContent: 'center' 
+                        style={{
+                          background: '#ef4444',
+                          color: '#fff',
+                          border: 'none',
+                          cursor: 'pointer',
+                          width: 30,
+                          height: 30,
+                          borderRadius: '50%',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
                         }}
                       >
                         <Trash2 size={14} />
@@ -418,10 +418,10 @@ export default function UsersPage() {
       )}
 
       {/* View Company Modal */}
-      <Modal 
-        open={!!viewingCompany} 
-        onClose={() => setViewingCompany(null)} 
-        title="Company Details" 
+      <Modal
+        open={!!viewingCompany}
+        onClose={() => setViewingCompany(null)}
+        title="Company Details"
         maxWidth={540}
         footer={
           <>
@@ -465,24 +465,24 @@ export default function UsersPage() {
       </Modal>
 
       {/* Confirm Deletions */}
-      <ConfirmDialog 
-        open={!!toDeleteCompany} 
-        title="Delete Company" 
-        message="This will remove the company and all its coupons." 
-        danger 
-        confirmLabel="Delete" 
-        onConfirm={deleteCompany} 
-        onCancel={() => setToDeleteCompany(null)} 
+      <ConfirmDialog
+        open={!!toDeleteCompany}
+        title="Delete Company"
+        message="This will remove the company and all its coupons."
+        danger
+        confirmLabel="Delete"
+        onConfirm={deleteCompany}
+        onCancel={() => setToDeleteCompany(null)}
       />
 
-      <ConfirmDialog 
-        open={!!toDeleteUser} 
-        title="Delete User" 
-        message="This will permanently remove the user account." 
-        danger 
-        confirmLabel="Delete" 
-        onConfirm={deleteUser} 
-        onCancel={() => setToDeleteUser(null)} 
+      <ConfirmDialog
+        open={!!toDeleteUser}
+        title="Delete User"
+        message="This will permanently remove the user account."
+        danger
+        confirmLabel="Delete"
+        onConfirm={deleteUser}
+        onCancel={() => setToDeleteUser(null)}
       />
     </DashboardLayout>
   );

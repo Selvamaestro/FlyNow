@@ -1,25 +1,46 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { TrendingUp, Zap, ArrowRight, Star, Quote } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useAsync } from '../../lib/use-async';
-import { couponService, companyService, categoryService } from '../../lib/services';
-import CouponCard from '../../components/CouponCard';
-import EmptyState from '../../components/EmptyState';
+import { couponService, categoryService } from '../../lib/services';
 import { PageLoader } from '../../components/Spinner';
-import { formatDate } from '../../lib/utils';
 import { getCategoryIcon } from '../../lib/category-icons';
+
+function FlashCountdown({ createdAt }: { createdAt: string }) {
+  const [timeLeft, setTimeLeft] = useState('');
+
+  useEffect(() => {
+    const calculateTime = () => {
+      const end = new Date(createdAt).getTime() + 48 * 60 * 60 * 1000;
+      const diff = end - Date.now();
+      if (diff <= 0) {
+        return 'Expired';
+      }
+      const hrs = Math.floor(diff / (1000 * 60 * 60));
+      const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const secs = Math.floor((diff % (1000 * 60)) / 1000);
+      return `${String(hrs).padStart(2, '0')}h : ${String(mins).padStart(2, '0')}m : ${String(secs).padStart(2, '0')}s`;
+    };
+
+    setTimeLeft(calculateTime());
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTime());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [createdAt]);
+
+  return <span>{timeLeft}</span>;
+}
 
 export default function LandingPage() {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const { data: coupons, loading } = useAsync(() => couponService.listApproved(), []);
-  const { data: companies } = useAsync(() => companyService.listApproved(), []);
   const { data: categories } = useAsync(() => categoryService.list(), []);
 
   const featured = (coupons ?? []).slice(0, 8);
-  const trending = (companies ?? []).slice(0, 6);
-  const flash = (coupons ?? []).filter((c) => new Date(c.expiry_date).getTime() - Date.now() < 7 * 86400000).slice(0, 4);
-  const latest = (coupons ?? []).slice(0, 6);
+  const flash = (coupons ?? []).filter((c) => c.is_flash === true).slice(0, 4);
 
   const search = () => navigate(`/offers?q=${encodeURIComponent(query)}`);
 const flashDeals = [
@@ -651,110 +672,129 @@ const steps = [
         }}
     >
 
-        {flashDeals.map((deal) => (
+        {(flash.length > 0 ? flash : flashDeals).map((deal) => {
+            const isDbCoupon = 'created_at' in deal;
+            return (
+                <div
+                    key={deal.id}
+                    onClick={() => isDbCoupon && navigate(`/coupons/${deal.id}`)}
+                    style={{
+                        background: "#fff",
+                        borderRadius: 22,
+                        overflow: "hidden",
+                        boxShadow: "0 12px 35px rgba(0,0,0,.08)",
+                        transition: ".3s",
+                        cursor: isDbCoupon ? 'pointer' : 'default',
+                    }}
+                >
 
-            <div
-                key={deal.id}
-                style={{
-                    background: "#fff",
-                    borderRadius: 22,
-                    overflow: "hidden",
-                    boxShadow: "0 12px 35px rgba(0,0,0,.08)",
-                    transition: ".3s",
-                }}
-            >
+                    <div style={{ position: "relative" }}>
 
-                <div style={{ position: "relative" }}>
-
-                    <img
-                        src={deal.image}
-                        alt={deal.title}
-                        style={{
-                            width: "100%",
-                            height: 210,
-                            objectFit: "cover",
-                        }}
-                    />
-
-                    <div
-                        style={{
-                            position: "absolute",
-                            top: 15,
-                            left: 15,
-                            background: "#F4B400",
-                            color: "#fff",
-                            padding: "8px 18px",
-                            borderRadius: 50,
-                            fontWeight: 700,
-                        }}
-                    >
-                        {deal.discount}
-                    </div>
-
-                </div>
-
-                <div style={{ padding: 22 }}>
-
-                    <p
-                        style={{
-                            color: "#888",
-                            marginBottom: 8,
-                            fontSize: 14,
-                        }}
-                    >
-                        {deal.company}
-                    </p>
-
-                    <h3
-                        style={{
-                            fontSize: 24,
-                            marginBottom: 16,
-                        }}
-                    >
-                        {deal.title}
-                    </h3>
-
-                    <div
-                        style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            marginBottom: 20,
-                        }}
-                    >
-
-                        <span
+                        <img
+                            src={isDbCoupon ? deal.flyer_image_url : deal.image}
+                            alt={deal.title}
                             style={{
-                                color: "#E53935",
+                                width: "100%",
+                                height: 210,
+                                objectFit: "cover",
+                            }}
+                        />
+
+                        <div
+                            style={{
+                                position: "absolute",
+                                top: 15,
+                                left: 15,
+                                background: "#F4B400",
+                                color: "#fff",
+                                padding: "8px 18px",
+                                borderRadius: 50,
                                 fontWeight: 700,
                             }}
                         >
-                            {deal.time}
-                        </span>
+                            {deal.discount}
+                        </div>
 
                     </div>
 
-                    <button
-                        className="btn"
-                        style={{
-                            width: "100%",
-                            background: "#E4A817",
-                            color: "#fff",
-                            borderRadius: 14,
-                            border: "none",
-                            padding: "14px",
-                            fontWeight: 600,
-                            cursor: "pointer",
-                        }}
-                    >
-                        Save Coupon
-                    </button>
+                    <div style={{ padding: 22 }}>
+
+                        <p
+                            style={{
+                                color: "#888",
+                                marginBottom: 8,
+                                fontSize: 14,
+                            }}
+                        >
+                            {isDbCoupon ? deal.company?.name : deal.company}
+                        </p>
+
+                        <h3
+                            style={{
+                                fontSize: 22,
+                                marginBottom: 16,
+                                height: 52,
+                                overflow: 'hidden',
+                                fontWeight: 700,
+                            }}
+                        >
+                            {deal.title}
+                        </h3>
+
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                marginBottom: 20,
+                            }}
+                        >
+
+                            <span
+                                style={{
+                                    color: "#E53935",
+                                    fontWeight: 700,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 6,
+                                }}
+                            >
+                                {isDbCoupon ? (
+                                  <>⏱️ <FlashCountdown createdAt={deal.created_at} /></>
+                                ) : (
+                                  deal.time
+                                )}
+                            </span>
+
+                        </div>
+
+                        <button
+                            className="btn"
+                            onClick={(e) => {
+                              if (isDbCoupon) {
+                                e.stopPropagation();
+                                navigate(`/coupons/${deal.id}`);
+                              }
+                            }}
+                            style={{
+                                width: "100%",
+                                background: "#E4A817",
+                                color: "#fff",
+                                borderRadius: 14,
+                                border: "none",
+                                padding: "14px",
+                                fontWeight: 600,
+                                cursor: isDbCoupon ? 'pointer' : 'pointer',
+                            }}
+                        >
+                            {isDbCoupon ? 'View Coupon' : 'Save Coupon'}
+                        </button>
+
+                    </div>
 
                 </div>
-
-            </div>
-
-        ))}
+            );
+        })}
 
     </div>
 

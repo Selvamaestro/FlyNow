@@ -23,6 +23,7 @@ import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 
 import CompanyDashboard from './pages/company/CompanyDashboard';
 import UploadFlyerPage from './pages/company/UploadFlyerPage';
+import UploadFlashSalePage from './pages/company/UploadFlashSalePage';
 import MyFlyersPage from './pages/company/MyFlyersPage';
 import MyCouponsPage from './pages/company/MyCouponsPage';
 import CompanyAnalyticsPage from './pages/company/CompanyAnalyticsPage';
@@ -32,7 +33,6 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminCategoriesPage from './pages/admin/CategoriesPage';
 import CompaniesPage from './pages/admin/CompaniesPage';
 import AdminCouponsPage from './pages/admin/AdminCouponsPage';
-import UsersPage from './pages/admin/UsersPage';
 import ReportsPage from './pages/admin/ReportsPage';
 import AnalyticsPage from './pages/admin/AnalyticsPage';
 import AdminNotificationsPage from './pages/admin/AdminNotificationsPage';
@@ -68,6 +68,7 @@ export default function App() {
             {/* Company */}
             <Route path="/company" element={<ProtectedRoute roles={['company']}><CompanyDashboard /></ProtectedRoute>} />
             <Route path="/company/upload" element={<ProtectedRoute roles={['company']}><UploadFlyerPage /></ProtectedRoute>} />
+            <Route path="/company/flash-sale" element={<ProtectedRoute roles={['company']}><UploadFlashSalePage /></ProtectedRoute>} />
             <Route path="/company/flyers" element={<ProtectedRoute roles={['company']}><MyFlyersPage /></ProtectedRoute>} />
             <Route path="/company/coupons" element={<ProtectedRoute roles={['company']}><MyCouponsPage /></ProtectedRoute>} />
             <Route path="/company/analytics" element={<ProtectedRoute roles={['company']}><CompanyAnalyticsPage /></ProtectedRoute>} />
@@ -78,7 +79,6 @@ export default function App() {
             <Route path="/admin/categories" element={<ProtectedRoute roles={['admin']}><AdminCategoriesPage /></ProtectedRoute>} />
             <Route path="/admin/companies" element={<ProtectedRoute roles={['admin']}><CompaniesPage /></ProtectedRoute>} />
             <Route path="/admin/coupons" element={<ProtectedRoute roles={['admin']}><AdminCouponsPage /></ProtectedRoute>} />
-            <Route path="/admin/users" element={<ProtectedRoute roles={['admin']}><UsersPage /></ProtectedRoute>} />
             <Route path="/admin/reports" element={<ProtectedRoute roles={['admin']}><ReportsPage /></ProtectedRoute>} />
             <Route path="/admin/analytics" element={<ProtectedRoute roles={['admin']}><AnalyticsPage /></ProtectedRoute>} />
             <Route path="/admin/notifications" element={<ProtectedRoute roles={['admin']}><AdminNotificationsPage /></ProtectedRoute>} />

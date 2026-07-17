@@ -16,11 +16,10 @@ export default function OffersPage() {
     seconds: 0,
   });
   const [params] = useSearchParams();
-  const [q, setQ] = useState(params.get('q') ?? '');
-  const [cat, setCat] = useState('all');
-  const [sort, setSort] = useState('newest');
+  const [q] = useState(params.get('q') ?? '');
+  const [cat] = useState('all');
+  const [sort] = useState('newest');
   const { data: coupons, loading } = useAsync(() => couponService.listApproved(), []);
-  const { data: categories } = useAsync(() => categoryService.list(), []);
 
   const filtered = useMemo(() => {
     let list = coupons ?? [];
@@ -161,7 +160,6 @@ export default function OffersPage() {
   const [spinning, setSpinning] = useState(false);
 
   const [rotation, setRotation] = useState(0);
-  const [winnerIndex, setWinnerIndex] = useState<number | null>(null);
 
   const [reward, setReward] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
@@ -206,8 +204,6 @@ export default function OffersPage() {
 
       const winner =
         Math.floor(normalized / slice);
-
-      setWinnerIndex(winner);
 
       setReward(rewards[winner].reward);
 
