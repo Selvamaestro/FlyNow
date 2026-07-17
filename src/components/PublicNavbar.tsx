@@ -8,14 +8,14 @@ export default function PublicNavbar() {
   const [menu, setMenu] = useState(false);
   const navigate = useNavigate();
 
-  const links = [
-    { to: '/', label: 'Home' },
-    { to: '/offers', label: 'Offers' },
-    { to: '/categories', label: 'Categories' },
-    { to: '/saved', label: 'Wallet' },
-    { to: '/about', label: 'About' },
-    { to: '/contact', label: 'Contact' },
-  ];
+const links = [
+  { to: '/', label: 'Home' },
+  { to: '/offers', label: 'Offers' },
+  { to: '/categories', label: 'Categories' },
+  { to: '/wallet', label: 'Wallet' },
+  { to: '/about', label: 'About' },
+  { to: '/contact', label: 'Contact' },
+];
 
   const dashLink = profile?.role === 'company' ? '/company' : profile?.role === 'admin' ? '/admin' : null;
 
@@ -45,7 +45,7 @@ export default function PublicNavbar() {
                   <div className="card" style={{ position: 'absolute', right: 0, top: 48, zIndex: 50, minWidth: 200, padding: 8 }}>
                     <Link to="/profile" className="sidebar-link" onClick={() => setMenu(false)}><User size={16} /> Profile</Link>
 <Link
-  to="/saved"
+  to="/wallet"
   className="sidebar-link"
   onClick={() => setMenu(false)}
 >

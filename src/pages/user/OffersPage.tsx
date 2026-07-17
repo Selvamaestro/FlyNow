@@ -703,6 +703,7 @@ https://flynow.com`;
               title: "Electronics Festival",
               subtitle: "Up to 70% OFF",
               brands: "Samsung • Apple • Boat • Dell",
+              company: "Samsung",
               color: "#EEF5FF",
             },
 
@@ -711,6 +712,7 @@ https://flynow.com`;
               title: "Fashion Fiesta",
               subtitle: "Buy 2 Get 1",
               brands: "Nike • Puma • Adidas • Myntra",
+              company: "Myntra",
               color: "#FFF1F7",
             },
 
@@ -719,6 +721,7 @@ https://flynow.com`;
               title: "Home Essentials",
               subtitle: "Extra 35% OFF",
               brands: "Prestige • IKEA • Philips",
+              company: "IKEA",
               color: "#F3FFF2",
             },
 
@@ -727,104 +730,116 @@ https://flynow.com`;
               title: "Fresh Grocery Week",
               subtitle: "Flat ₹300 OFF",
               brands: "BigBasket • Blinkit • Zepto",
+              company: "BigBasket",
               color: "#FFF9ED",
             },
+          ].map((deal) => {
+            const coupon = coupons?.find(
+              (c) => c.company?.name === deal.company
+            );
 
-          ].map((deal) => (
-
-            <div
-              key={deal.title}
-              style={{
-                background: deal.color,
-                borderRadius: 24,
-                display: "flex",
-                alignItems: "center",
-                overflow: "hidden",
-                padding: 20,
-                boxShadow: "0 10px 30px rgba(0,0,0,.06)",
-              }}
-            >
-
-              <img
-                src={deal.image}
-                alt={deal.title}
-                style={{
-                  width: 170,
-                  height: 170,
-                  objectFit: "cover",
-                  borderRadius: 18,
-                }}
-              />
+            return (
 
               <div
+                key={deal.title}
                 style={{
-                  marginLeft: 24,
-                  flex: 1,
+                  background: deal.color,
+                  borderRadius: 24,
+                  display: "flex",
+                  alignItems: "center",
+                  overflow: "hidden",
+                  padding: 20,
+                  boxShadow: "0 10px 30px rgba(0,0,0,.06)",
                 }}
               >
 
-                <div
+                <img
+                  src={deal.image}
+                  alt={deal.title}
                   style={{
-                    background: "#fff",
-                    display: "inline-block",
-                    padding: "6px 14px",
-                    borderRadius: 20,
-                    color: "#E4A817",
-                    fontWeight: 700,
-                    marginBottom: 12,
+                    width: 170,
+                    height: 170,
+                    objectFit: "cover",
+                    borderRadius: 18,
                   }}
-                >
-                  Weekly Deal
-                </div>
-
-                <h3
-                  style={{
-                    fontSize: 26,
-                    marginBottom: 10,
-                  }}
-                >
-                  {deal.title}
-                </h3>
+                />
 
                 <div
                   style={{
-                    color: "#E4A817",
-                    fontSize: 20,
-                    fontWeight: 800,
-                    marginBottom: 12,
+                    marginLeft: 24,
+                    flex: 1,
                   }}
                 >
-                  {deal.subtitle}
+
+                  <div
+                    style={{
+                      background: "#fff",
+                      display: "inline-block",
+                      padding: "6px 14px",
+                      borderRadius: 20,
+                      color: "#E4A817",
+                      fontWeight: 700,
+                      marginBottom: 12,
+                    }}
+                  >
+                    Weekly Deal
+                  </div>
+
+                  <h3
+                    style={{
+                      fontSize: 26,
+                      marginBottom: 10,
+                    }}
+                  >
+                    {deal.title}
+                  </h3>
+
+                  <div
+                    style={{
+                      color: "#E4A817",
+                      fontSize: 20,
+                      fontWeight: 800,
+                      marginBottom: 12,
+                    }}
+                  >
+                    {deal.subtitle}
+                  </div>
+
+                  <p
+                    style={{
+                      color: "#666",
+                      marginBottom: 18,
+                    }}
+                  >
+                    {deal.brands}
+                  </p>
+
+                  <button
+                    onClick={() => {
+                      if (coupon) {
+                        navigate(`/coupons/${coupon.id}`);
+                      } else {
+                        alert("Coupon not available.");
+                      }
+                    }}
+                    style={{
+                      background: "#E4A817",
+                      color: "#fff",
+                      border: "none",
+                      padding: "12px 26px",
+                      borderRadius: 12,
+                      cursor: "pointer",
+                      fontWeight: 700,
+                    }}
+                  >
+                    Explore →
+                  </button>
+
                 </div>
-
-                <p
-                  style={{
-                    color: "#666",
-                    marginBottom: 18,
-                  }}
-                >
-                  {deal.brands}
-                </p>
-
-                <button
-                  style={{
-                    background: "#E4A817",
-                    color: "#fff",
-                    border: "none",
-                    padding: "12px 26px",
-                    borderRadius: 12,
-                    cursor: "pointer",
-                    fontWeight: 700,
-                  }}
-                >
-                  Explore →
-                </button>
 
               </div>
-
-            </div>
-
-          ))}
+            );
+          })}
 
         </div>
 
