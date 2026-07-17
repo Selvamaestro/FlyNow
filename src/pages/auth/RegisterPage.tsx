@@ -68,7 +68,7 @@ export default function RegisterPage() {
         {error && <div className="field-error flex items-center gap-8"><AlertCircle size={14} /> {error}</div>}
         <button className="btn btn-primary btn-lg w-full" disabled={loading}>{loading ? 'Creating account...' : 'Create Account'}</button>
       </form>
-      <p className="text-center text-sm text-muted mt-24">Already have an account? <Link to="/login" style={{ color: 'var(--primary-dark)', fontWeight: 600 }}>User sign in</Link> · <Link to="/company/login" style={{ color: '#5B5FEF', fontWeight: 600 }}>Company</Link> · <Link to="/admin/login" style={{ color: 'var(--text)', fontWeight: 600 }}>Admin</Link></p>
+      <p className="text-center text-sm text-muted mt-24">Already have an account? <Link to="/login" style={{ color: 'var(--primary-dark)', fontWeight: 600 }}>User sign in</Link> · <Link to="/company/login" style={{ color: '#E4A817', fontWeight: 600 }}>Company</Link> · <Link to="/admin/login" style={{ color: 'var(--text)', fontWeight: 600 }}>Admin</Link></p>
     </AuthLayout>
   );
 }

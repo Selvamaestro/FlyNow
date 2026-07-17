@@ -28,7 +28,7 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <AuthLayout title="Admin Portal" subtitle="Restricted access. Administrators only." icon={Shield} accentColor="#2E2E2E" accentGradient="linear-gradient(135deg, #2E2E2E, #1a1a1a)"
+    <AuthLayout title="Admin Portal" subtitle="Restricted access. Administrators only." icon={Shield} accentColor="#E4A817" accentGradient="linear-gradient(135deg, #E4A817, #D89B17)"
       features={['Full platform management', 'Review and approve coupons', 'Manage companies and users', 'Analytics and revenue reports']}
       footerLink={{ to: '/login', label: 'Not an admin? Back to' }}>
       {params.get('suspended') && <div className="badge badge-danger mb-16" style={{ padding: 12, width: '100%' }}><AlertCircle size={16} /> Your account has been suspended.</div>}
@@ -42,9 +42,9 @@ export default function AdminLoginPage() {
           <div className="flex items-center gap-8"><Lock size={18} style={{ color: 'var(--text-muted)' }} /><input className="input" type={showPw ? 'text' : 'password'} required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />{password && <button type="button" onClick={() => setShowPw(!showPw)} className="btn-icon">{showPw ? <EyeOff size={16} /> : <Eye size={16} />}</button>}</div>
         </div>
         {error && <div className="field-error flex items-center gap-8"><AlertCircle size={14} /> {error}</div>}
-        <button className="btn btn-lg w-full" style={{ background: '#2E2E2E', color: '#fff' }} disabled={loading}>{loading ? 'Signing in...' : 'Sign In to Admin Portal'}</button>
+        <button className="btn btn-lg w-full" style={{ background: 'linear-gradient(135deg, #E4A817, #D89B17)', color: '#fff', border: 'none' }} disabled={loading}>{loading ? 'Signing in...' : 'Sign In to Admin Portal'}</button>
       </form>
-      <p className="text-center text-sm text-muted mt-24">Not an admin? <Link to="/login" style={{ color: 'var(--primary-dark)', fontWeight: 600 }}>User login</Link> · <Link to="/company/login" style={{ color: '#5B5FEF', fontWeight: 600 }}>Company login</Link></p>
+      <p className="text-center text-sm text-muted mt-24">Not an admin? <Link to="/login" style={{ color: 'var(--primary-dark)', fontWeight: 600 }}>User login</Link> · <Link to="/company/login" style={{ color: '#E4A817', fontWeight: 600 }}>Company login</Link></p>
     </AuthLayout>
   );
 }

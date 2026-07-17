@@ -28,7 +28,7 @@ export default function CompanyLoginPage() {
   };
 
   return (
-    <AuthLayout title="Company Portal" subtitle="Sign in to manage your flyers and coupons." icon={Building2} accentColor="#5B5FEF" accentGradient="linear-gradient(135deg, #5B5FEF, #4248D4)"
+    <AuthLayout title="Company Portal" subtitle="Sign in to manage your flyers and coupons." icon={Building2} accentColor="#E4A817" accentGradient="linear-gradient(135deg, #E4A817, #D89B17)"
       features={['Upload unlimited flyers', 'Track coupon performance', 'Real-time analytics dashboard', 'Manage your company profile']}
       footerLink={{ to: '/register', label: "Don't have a company account?" }}>
       {params.get('suspended') && <div className="badge badge-danger mb-16" style={{ padding: 12, width: '100%' }}><AlertCircle size={16} /> Your account has been suspended.</div>}
@@ -43,11 +43,11 @@ export default function CompanyLoginPage() {
         </div>
         {error && <div className="field-error flex items-center gap-8"><AlertCircle size={14} /> {error}</div>}
         <div className="flex items-center justify-between">
-          <Link to="/forgot-password" className="text-sm" style={{ color: '#5B5FEF' }}>Forgot password?</Link>
+          <Link to="/forgot-password" className="text-sm" style={{ color: '#E4A817' }}>Forgot password?</Link>
         </div>
-        <button className="btn btn-lg w-full" style={{ background: '#5B5FEF', color: '#fff' }} disabled={loading}>{loading ? 'Signing in...' : 'Sign In to Company Portal'}</button>
+        <button className="btn btn-lg w-full" style={{ background: 'linear-gradient(135deg, #E4A817, #D89B17)', color: '#fff', border: 'none' }} disabled={loading}>{loading ? 'Signing in...' : 'Sign In to Company Portal'}</button>
       </form>
-      <p className="text-center text-sm text-muted mt-24">Don't have a company account? <Link to="/register" style={{ color: '#5B5FEF', fontWeight: 600 }}>Register</Link></p>
+      <p className="text-center text-sm text-muted mt-24">Don't have a company account? <Link to="/register" style={{ color: '#E4A817', fontWeight: 600 }}>Register</Link></p>
     </AuthLayout>
   );
 }
