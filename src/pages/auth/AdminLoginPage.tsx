@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, AlertCircle, Shield } from 'lucide-react';
 import AuthLayout from './AuthLayout';
 import { useAuth } from '../../lib/auth-context';
