@@ -93,7 +93,7 @@ export default function CategoryPage() {
     }
 
     if (filter === "under1000") {
-      data = data.filter(c => c.discount_price < 1000);
+      data = data.filter(c => c.discount_price !== null && c.discount_price !== undefined && c.discount_price < 1000);
     }
 
     // Sorting
