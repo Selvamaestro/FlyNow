@@ -104,12 +104,7 @@ export default function AdminLoginPage() {
         </button>
       </form>
 
-      <div className="auth-footer" style={{ marginTop: 32 }}>
-        <span>Not an admin? </span>
-        <Link to="/login">User login</Link>
-        <span> · </span>
-        <Link to="/company/login">Company login</Link>
-      </div>
+
     </AuthLayout>
   );
 }
