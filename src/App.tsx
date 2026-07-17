@@ -78,7 +78,6 @@ export default function App() {
             <Route path="/admin/categories" element={<ProtectedRoute roles={['admin']}><AdminCategoriesPage /></ProtectedRoute>} />
             <Route path="/admin/companies" element={<ProtectedRoute roles={['admin']}><CompaniesPage /></ProtectedRoute>} />
             <Route path="/admin/coupons" element={<ProtectedRoute roles={['admin']}><AdminCouponsPage /></ProtectedRoute>} />
-            <Route path="/admin/users" element={<ProtectedRoute roles={['admin']}><UsersPage /></ProtectedRoute>} />
             <Route path="/admin/reports" element={<ProtectedRoute roles={['admin']}><ReportsPage /></ProtectedRoute>} />
             <Route path="/admin/analytics" element={<ProtectedRoute roles={['admin']}><AnalyticsPage /></ProtectedRoute>} />
             <Route path="/admin/notifications" element={<ProtectedRoute roles={['admin']}><AdminNotificationsPage /></ProtectedRoute>} />
