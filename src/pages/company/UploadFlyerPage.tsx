@@ -99,6 +99,7 @@ export default function UploadFlyerPage() {
         discount_price: form.discount_price ? parseFloat(form.discount_price) : null,
       });
       await notificationService.create({ type: 'coupon_submission', title: 'New coupon submission', message: `${company.name} submitted "${form.title}" for review.`, target_role: 'admin', ref_id: company.id });
+      await notificationService.create({ type: 'coupon_pending', title: 'Coupon Pending Review', message: `Your coupon "${form.title}" was submitted and is pending review.`, target_role: 'company', ref_id: company.id });
       show('Flyer uploaded! Status: Pending', 'success');
       navigate('/company/flyers');
     } catch (err) {

@@ -28,6 +28,7 @@ import MyFlyersPage from './pages/company/MyFlyersPage';
 import MyCouponsPage from './pages/company/MyCouponsPage';
 import CompanyAnalyticsPage from './pages/company/CompanyAnalyticsPage';
 import CompanySettingsPage from './pages/company/CompanySettingsPage';
+import CompanyNotificationsPage from './pages/company/CompanyNotificationsPage';
 
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminCategoriesPage from './pages/admin/CategoriesPage';
@@ -73,6 +74,7 @@ export default function App() {
             <Route path="/company/coupons" element={<ProtectedRoute roles={['company']}><MyCouponsPage /></ProtectedRoute>} />
             <Route path="/company/analytics" element={<ProtectedRoute roles={['company']}><CompanyAnalyticsPage /></ProtectedRoute>} />
             <Route path="/company/settings" element={<ProtectedRoute roles={['company']}><CompanySettingsPage /></ProtectedRoute>} />
+            <Route path="/company/notifications" element={<ProtectedRoute roles={['company']}><CompanyNotificationsPage /></ProtectedRoute>} />
 
             {/* Admin */}
             <Route path="/admin" element={<ProtectedRoute roles={['admin']}><AdminDashboard /></ProtectedRoute>} />

@@ -1,6 +1,6 @@
 import { type ReactNode, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Tag, Menu, LogOut, Bell, Search } from 'lucide-react';
+import { Tag, Menu, LogOut, Bell } from 'lucide-react';
 import { useAuth } from '../lib/auth-context';
 
 export interface NavItem { to: string; label: string; icon: ReactNode; }
@@ -48,8 +48,14 @@ export default function DashboardLayout({ items, brand, children }: DashLayoutPr
             <h3 style={{ fontSize: 18 }}>{items.find((i) => loc.pathname.startsWith(i.to))?.label ?? 'Dashboard'}</h3>
           </div>
           <div className="flex items-center gap-12">
-            <button className="btn-icon btn-secondary hide-mobile"><Search size={18} /></button>
-            <button className="btn-icon btn-secondary hide-mobile" style={{ position: 'relative' }}><Bell size={18} /><span style={{ position: 'absolute', top: 4, right: 4, width: 8, height: 8, background: 'var(--danger)', borderRadius: '50%' }} /></button>
+            <button 
+              className="btn-icon btn-secondary hide-mobile" 
+              onClick={() => navigate(brand.toLowerCase() === 'admin' ? '/admin/notifications' : brand.toLowerCase() === 'company' ? '/company/notifications' : '/notifications')} 
+              style={{ position: 'relative' }}
+            >
+              <Bell size={18} />
+              <span style={{ position: 'absolute', top: 4, right: 4, width: 8, height: 8, background: 'var(--danger)', borderRadius: '50%' }} />
+            </button>
             <div className="stat-icon" style={{ width: 34, height: 34, background: 'var(--primary)', color: '#fff', fontSize: 13 }}>{profile?.display_name?.[0]?.toUpperCase()}</div>
           </div>
         </div>
