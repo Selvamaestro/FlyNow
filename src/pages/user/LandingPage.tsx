@@ -36,6 +36,7 @@ function FlashCountdown({ createdAt }: { createdAt: string }) {
 export default function LandingPage() {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
+  const [activeRoadmapTab, setActiveRoadmapTab] = useState<'shoppers' | 'businesses'>('shoppers');
   const { data: coupons, loading } = useAsync(() => couponService.listApproved(), []);
   const { data: categories } = useAsync(() => categoryService.list(), []);
 
@@ -111,38 +112,7 @@ const exclusiveCoupons = [
     image: "/images/bigbasket.jpg",
   },
 ];
-const steps = [
-  {
-    icon: "🔍",
-    title: "Browse Offers",
-    desc: "Explore thousands of verified offers from top brands.",
-  },
-  {
-    icon: "💾",
-    title: "Save Coupon",
-    desc: "Save your favourite coupons with one click.",
-  },
-  {
-    icon: "👛",
-    title: "Open Wallet",
-    desc: "All saved coupons are stored securely in your wallet.",
-  },
-  {
-    icon: "📱",
-    title: "Show QR Code",
-    desc: "Open the coupon and display its QR code.",
-  },
-  {
-    icon: "🛒",
-    title: "Scan at Store",
-    desc: "The cashier scans your QR code instantly.",
-  },
-  {
-    icon: "🎉",
-    title: "Enjoy Savings",
-    desc: "Discount applied successfully. Happy Shopping!",
-  },
-];
+
   return (
     <div>
       {/* Hero */}
@@ -950,111 +920,327 @@ const steps = [
     </div>
 
 </section>
-      <section
-  className="container"
-  style={{
-    padding: "70px 24px",
-  }}
->
-  <div
-    style={{
-      textAlign: "center",
-      marginBottom: 50,
-    }}
-  >
-    <h2
-      style={{
-        fontSize: 38,
-        fontWeight: 700,
-        marginBottom: 12,
-      }}
-    >
-      🚀 How FlyNow Works
-    </h2>
 
-    <p
-      style={{
-        color: "#666",
-        fontSize: 18,
-      }}
-    >
-      Save coupons digitally and redeem them instantly at stores.
-    </p>
-  </div>
-
-  <div
-    style={{
-      display: "grid",
-      gridTemplateColumns: "repeat(6,1fr)",
-      gap: 22,
-    }}
-  >
-    {steps.map((step, index) => (
-      <div
-        key={index}
-        style={{
-          background: "#fff",
-          borderRadius: 22,
-          padding: "28px 18px",
-          textAlign: "center",
-          boxShadow: "0 10px 30px rgba(0,0,0,.08)",
-          position: "relative",
-        }}
-      >
+      <section className="container" style={{ padding: "90px 24px" }}>
+        {/* Roadmap Header */}
         <div
           style={{
-            width: 75,
-            height: 75,
-            borderRadius: "50%",
-            background: "#FFF6DD",
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 34,
-            margin: "0 auto 18px",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+            borderBottom: "1px solid #ECE8DD",
+            paddingBottom: 24,
+            marginBottom: 50,
+            flexWrap: "wrap",
+            gap: 20
           }}
         >
-          {step.icon}
-        </div>
+          <div>
+            <h2
+              style={{
+                fontSize: 42,
+                fontWeight: 800,
+                color: "#222",
+                marginBottom: 12
+              }}
+            >
+              {roadmapData[activeRoadmapTab].title}
+            </h2>
+            <p
+              style={{
+                color: "#666",
+                fontSize: 18,
+                maxWidth: 650,
+                margin: 0
+              }}
+            >
+              {roadmapData[activeRoadmapTab].subtitle}
+            </p>
+          </div>
 
-        <h3
-          style={{
-            fontSize: 20,
-            fontWeight: 700,
-            marginBottom: 10,
-          }}
-        >
-          {step.title}
-        </h3>
-
-        <p
-          style={{
-            color: "#777",
-            fontSize: 15,
-            lineHeight: 1.6,
-          }}
-        >
-          {step.desc}
-        </p>
-
-        {index !== steps.length - 1 && (
+          {/* Tabs Navigation */}
           <div
             style={{
-              position: "absolute",
-              top: "50%",
-              right: "-14px",
-              fontSize: 24,
-              color: "#E4A817",
-              transform: "translateY(-50%)",
+              display: "flex",
+              gap: 28,
+              fontSize: 16,
+              fontWeight: 700
             }}
           >
-            →
+            {(['shoppers', 'businesses'] as const).map((tab) => {
+              const isActive = activeRoadmapTab === tab;
+              return (
+                <button
+                  key={tab}
+                  onClick={() => setActiveRoadmapTab(tab)}
+                  style={{
+                    padding: "8px 0 16px",
+                    color: isActive ? "#222" : "#999",
+                    borderBottom: isActive ? "3px solid #E4A817" : "3px solid transparent",
+                    transition: "all 0.2s",
+                    textTransform: "capitalize",
+                    fontSize: "17px",
+                    fontWeight: 700,
+                    cursor: "pointer"
+                  }}
+                >
+                  {tab}
+                </button>
+              );
+            })}
           </div>
-        )}
-      </div>
-    ))}
-  </div>
-</section>
+        </div>
+
+        {/* Roadmap Body */}
+        <div>
+          {/* Timeline Line */}
+          <div
+            style={{
+              position: "relative",
+              height: 2,
+              background: "#ECE8DD",
+              marginBottom: 35,
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr 1fr",
+            }}
+          >
+            {/* Node 1 */}
+            <div style={{ position: "relative" }}>
+              <div
+                style={{
+                  position: "absolute",
+                  top: -5,
+                  left: 0,
+                  width: 12,
+                  height: 12,
+                  borderRadius: "50%",
+                  background: "#fff",
+                  border: "2px solid #E4A817"
+                }}
+              />
+            </div>
+            {/* Node 2 */}
+            <div style={{ position: "relative" }}>
+              <div
+                style={{
+                  position: "absolute",
+                  top: -5,
+                  left: 0,
+                  width: 12,
+                  height: 12,
+                  borderRadius: "50%",
+                  background: "#fff",
+                  border: "2px solid #E4A817"
+                }}
+              />
+            </div>
+            {/* Node 3 */}
+            <div style={{ position: "relative" }}>
+              <div
+                style={{
+                  position: "absolute",
+                  top: -5,
+                  left: 0,
+                  width: 12,
+                  height: 12,
+                  borderRadius: "50%",
+                  background: "#fff",
+                  border: "2px solid #E4A817"
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Columns Grid */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: 40,
+              position: "relative"
+            }}
+            className="grid-roadmap"
+          >
+            {roadmapData[activeRoadmapTab].phases.map((phase, pIdx) => (
+              <div
+                key={phase.name}
+                style={{
+                  borderRight: pIdx < 2 ? "1px solid #F3F1EA" : "none",
+                  paddingRight: pIdx < 2 ? 40 : 0
+                }}
+              >
+                {/* Phase Title */}
+                <h3
+                  style={{
+                    fontSize: 24,
+                    fontWeight: 800,
+                    color: "#222",
+                    marginBottom: 32,
+                    display: "flex",
+                    alignItems: "baseline",
+                    gap: 8
+                  }}
+                >
+                  <span style={{ fontSize: 18, color: "#E4A817", fontWeight: 700 }}>{phase.num}.</span>
+                  {phase.name}
+                </h3>
+
+                {/* Sub-items List */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 28
+                  }}
+                >
+                  {phase.items.map((item) => (
+                    <div key={item.title}>
+                      <h4
+                        style={{
+                          fontSize: 18,
+                          fontWeight: 700,
+                          color: "#222",
+                          marginBottom: 8
+                        }}
+                      >
+                        {item.title}
+                      </h4>
+                      <p
+                        style={{
+                          color: "#666",
+                          fontSize: 15,
+                          lineHeight: 1.6,
+                          margin: 0
+                        }}
+                      >
+                        {item.desc}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <style>{`
+          @media (max-width: 768px) {
+            .grid-roadmap {
+              grid-template-columns: 1fr !important;
+              gap: 30px !important;
+            }
+            .grid-roadmap > div {
+              border-right: none !important;
+              padding-right: 0 !important;
+              border-bottom: 1px solid #F3F1EA;
+              padding-bottom: 30px;
+            }
+            .grid-roadmap > div:last-child {
+              border-bottom: none;
+              padding-bottom: 0;
+            }
+          }
+        `}</style>
+      </section>
     </div>
   );
 }
+
+const roadmapData = {
+  shoppers: {
+    title: "How it works for Shoppers",
+    subtitle: "Find, save, and redeem exclusive coupons from your favorite local brands effortlessly.",
+    phases: [
+      {
+        num: "01",
+        name: "Discover Offers",
+        items: [
+          {
+            title: "Explore Curated Deals",
+            desc: "Browse through a diverse array of categories to find the best savings that match your interests."
+          },
+          {
+            title: "Filter by Preferences",
+            desc: "Search for specific brands or use personalized tags to discover relevant coupons instantly."
+          }
+        ]
+      },
+      {
+        num: "02",
+        name: "Save to Wallet",
+        items: [
+          {
+            title: "One-Click Save",
+            desc: "Store your selected coupons in a secure, digital wallet so you never lose them."
+          },
+          {
+            title: "Real-time Reminders",
+            desc: "Receive smart notifications when your saved coupons are close to expiring."
+          }
+        ]
+      },
+      {
+        num: "03",
+        name: "Redeem at Checkout",
+        items: [
+          {
+            title: "Instant Digital Codes",
+            desc: "Present your coupon barcode or copy the online promo code at the store checkouts."
+          },
+          {
+            title: "Track Your Savings",
+            desc: "View your total calculated savings history directly from your dashboard."
+          }
+        ]
+      }
+    ]
+  },
+  businesses: {
+    title: "How it works for Businesses",
+    subtitle: "Launch campaigns, target local customers, and boost conversions with analytical insights.",
+    phases: [
+      {
+        num: "01",
+        name: "Set Up Campaigns",
+        items: [
+          {
+            title: "Create Brand Coupons",
+            desc: "Use our campaign editor to design eye-catching coupons with customized rewards."
+          },
+          {
+            title: "Set Launch Schedule",
+            desc: "Configure target start times, expiration schedules, and redemption rules easily."
+          }
+        ]
+      },
+      {
+        num: "02",
+        name: "Distribute & Engage",
+        items: [
+          {
+            title: "Target Local Audits",
+            desc: "Promote your deals to shoppers based on proximity, behaviors, and shopping preferences."
+          },
+          {
+            title: "Live Offer Updates",
+            desc: "Modify coupon quantities, details, or expiration times on-the-fly dynamically."
+          }
+        ]
+      },
+      {
+        num: "03",
+        name: "Track Performance",
+        items: [
+          {
+            title: "Redemption Metrics",
+            desc: "Monitor your conversions, total reach, and ROI in real-time."
+          },
+          {
+            title: "Customer Insights",
+            desc: "Gain deep analysis on demographics and purchasing behaviors of your shoppers."
+          }
+        ]
+      }
+    ]
+  }
+};

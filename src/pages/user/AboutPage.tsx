@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Target, Heart, Zap, Building2, ShieldCheck, Globe, ArrowRight, Star } from 'lucide-react';
+import { Target, Heart, Building2, ShieldCheck, Globe, ArrowRight, Star } from 'lucide-react';
 
 const partners = [
   'Amazon', 'Flipkart', 'Myntra', 'Nike', 'IKEA',
@@ -21,7 +21,6 @@ const values = [
 
 const howItWorks = [
   { icon: Building2, title: 'For Companies', desc: 'Register your company, get approved by our team, then upload flyers and digital coupons that reach thousands of shoppers instantly.', color: '#F97316' },
-  { icon: Zap, title: 'For Admins', desc: 'Review every submission, approve quality offers, manage categories and brands, and keep the platform safe and vibrant.', color: '#3B82F6' },
   { icon: Heart, title: 'For Users', desc: 'Browse verified offers, save favorites to your digital wallet, and redeem exclusive coupons in-store or online with a single tap.', color: '#EC4899' },
 ];
 
@@ -392,7 +391,7 @@ export default function AboutPage() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
+              gridTemplateColumns: 'repeat(2, 1fr)',
               gap: 28,
             }}
           >

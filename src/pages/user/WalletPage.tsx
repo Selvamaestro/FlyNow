@@ -104,7 +104,6 @@ export default function WalletPage() {
     }, [filteredCoupons]);
 
 
-    // Expiring Soon
     const expiringSoon = useMemo(() => {
         const today = new Date();
 
