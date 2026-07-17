@@ -74,7 +74,11 @@ export interface SavedCoupon {
   user_id: string;
   coupon_id: string;
   created_at: string;
-  coupon?: Coupon;
+
+  redeemed: boolean;
+  redeemed_at?: string | null;
+
+  coupon: Coupon;
 }
 
 export interface NotificationItem {

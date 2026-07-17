@@ -156,6 +156,23 @@ export const savedCouponService = {
     await supabase.from('saved_coupons').insert({ user_id: userId, coupon_id: couponId });
     return true;
   },
+  redeem: async (savedCouponId: string) => {
+  console.log("Redeeming saved_coupon id:", savedCouponId);
+
+  const { data, error } = await supabase
+    .from("saved_coupons")
+    .update({
+      redeemed: true,
+      redeemed_at: new Date().toISOString(),
+    })
+    .eq("id", savedCouponId)
+    .select();
+
+  console.log("Updated rows:", data);
+  console.log("Error:", error);
+
+  if (error) throw error;
+},
   isSaved: async (userId: string, couponId: string): Promise<boolean> => {
     const { data } = await supabase.from('saved_coupons').select('id').eq('user_id', userId).eq('coupon_id', couponId).maybeSingle();
     return !!data;

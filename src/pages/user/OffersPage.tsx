@@ -1,11 +1,12 @@
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAsync } from '../../lib/use-async';
-import { couponService } from '../../lib/services';
-import CouponCard from '../../components/CouponCard';
+import { couponService, categoryService } from '../../lib/services';
 import EmptyState from '../../components/EmptyState';
 import { PageLoader } from '../../components/Spinner';
 import { useEffect, useMemo, useRef, useState } from "react";
 import Confetti from "react-confetti";
+import ScratchCard from "lesca-react-scratch-card";
+import { supabase } from "../../lib/supabase";
 
 export default function OffersPage() {
   const navigate = useNavigate();
@@ -51,9 +52,23 @@ export default function OffersPage() {
 
     return () => clearInterval(timer);
   }, []);
-    const [showSpinModal, setShowSpinModal] = useState(false);
-      const drawWheel = () => {
-     console.log("Canvas:", wheelRef.current);
+  const [showSpinModal, setShowSpinModal] = useState(false);
+  const [showScratchModal, setShowScratchModal] = useState(false);
+  const [scratchReward, setScratchReward] = useState("");
+  const [scratchRevealed, setScratchRevealed] = useState(false);
+  // Daily Check-In
+  const [showCheckInModal, setShowCheckInModal] = useState(false);
+  const [currentDay, setCurrentDay] = useState(1);
+  const [claimedDays, setClaimedDays] = useState<number[]>([]);
+  const [todayClaimed, setTodayClaimed] = useState(false);
+  const [checkInReward, setCheckInReward] = useState("");
+  // Refer & Earn
+  const [showReferModal, setShowReferModal] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const referralCode = "FLYNOW2026";
+  const drawWheel = () => {
+    console.log("Canvas:", wheelRef.current);
     const canvas = wheelRef.current;
     if (!canvas) return;
 
@@ -134,13 +149,13 @@ export default function OffersPage() {
     ctx.fillText("REWARDS", radius, radius + 18);
   };
 
-useEffect(() => {
-  if (showSpinModal) {
-    setTimeout(() => {
-      drawWheel();
-    }, 50);
-  }
-}, [showSpinModal]);
+  useEffect(() => {
+    if (showSpinModal) {
+      setTimeout(() => {
+        drawWheel();
+      }, 50);
+    }
+  }, [showSpinModal]);
 
   const [spinning, setSpinning] = useState(false);
 
@@ -179,8 +194,8 @@ useEffect(() => {
 
     setRotation(finalRotation);
     setTimeout(() => {
-  drawWheel();
-}, 5100);
+      drawWheel();
+    }, 5100);
 
     setTimeout(() => {
 
@@ -202,6 +217,132 @@ useEffect(() => {
 
     }, 5000);
   };
+  const dailyRewards = [
+    "⭐ 50 Reward Points",
+    "🎫 10% OFF Coupon",
+    "💰 ₹100 Cashback",
+    "⭐ 100 Reward Points",
+    "🚚 Free Delivery",
+    "🎁 Mystery Gift",
+    "🏆 Premium Reward Box",
+  ];
+  const handleDailyCheckIn = async () => {
+    if (todayClaimed) return;
+
+    const reward = dailyRewards[currentDay - 1];
+
+    const success = await saveReward(
+      "Daily Check-In",
+      reward,
+      reward.includes("Reward Points")
+        ? parseInt(reward.match(/\d+/)?.[0] || "0")
+        : 0
+    );
+
+    if (!success) return;
+
+    setCheckInReward(reward);
+
+    setClaimedDays((prev) => [...prev, currentDay]);
+
+    setTodayClaimed(true);
+
+    if (currentDay < 7) {
+      setCurrentDay((prev) => prev + 1);
+    }
+
+    alert("🎉 Daily reward claimed successfully!");
+  };
+
+  const copyReferralCode = async () => {
+    await navigator.clipboard.writeText(referralCode);
+
+    setCopied(true);
+
+    setTimeout(() => {
+      setCopied(false);
+    }, 2000);
+  };
+  const shareReferral = async () => {
+    const message = `🎉 Join FlyNow and start saving with amazing coupons!
+
+Use my referral code: ${referralCode}
+
+You'll get ₹100 OFF on your first order and I'll earn 500 Reward Points!
+
+https://flynow.com`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Join FlyNow",
+          text: message,
+        });
+      } catch (err) {
+        console.log("Share cancelled");
+      }
+    } else {
+      await navigator.clipboard.writeText(message);
+
+      alert("Sharing isn't supported on this browser.\nReferral message copied to clipboard!");
+    }
+  };
+  const saveReward = async (
+    rewardType: string,
+    rewardName: string,
+    rewardPoints: number = 0
+  ) => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      alert("Please login first.");
+      return false;
+    }
+
+    const { error } = await supabase
+      .from("user_rewards")
+      .insert({
+        user_id: user.id,
+        reward_type: rewardType,
+        reward_name: rewardName,
+        reward_points: rewardPoints,
+      });
+
+    if (error) {
+      console.error(error);
+      return false;
+    }
+
+    console.log("Reward saved!");
+    return true;
+  };
+  const claimScratchReward = async () => {
+    const success = await saveReward(
+      "Scratch Card",
+      scratchReward,
+      0
+    );
+
+    if (success) {
+      alert("🎉 Reward claimed successfully!");
+      setShowScratchModal(false);
+    }
+  };
+  const claimSpinReward = async () => {
+    const success = await saveReward(
+      "Spin & Win",
+      reward,
+      0
+    );
+
+    if (success) {
+      alert("🎉 Reward claimed successfully!");
+      setShowSpinModal(false);
+    }
+  };
+
 
   return (
     <div className="container" style={{ padding: '40px 24px' }}>
@@ -562,6 +703,7 @@ useEffect(() => {
               title: "Electronics Festival",
               subtitle: "Up to 70% OFF",
               brands: "Samsung • Apple • Boat • Dell",
+              company: "Samsung",
               color: "#EEF5FF",
             },
 
@@ -570,6 +712,7 @@ useEffect(() => {
               title: "Fashion Fiesta",
               subtitle: "Buy 2 Get 1",
               brands: "Nike • Puma • Adidas • Myntra",
+              company: "Myntra",
               color: "#FFF1F7",
             },
 
@@ -578,6 +721,7 @@ useEffect(() => {
               title: "Home Essentials",
               subtitle: "Extra 35% OFF",
               brands: "Prestige • IKEA • Philips",
+              company: "IKEA",
               color: "#F3FFF2",
             },
 
@@ -586,104 +730,116 @@ useEffect(() => {
               title: "Fresh Grocery Week",
               subtitle: "Flat ₹300 OFF",
               brands: "BigBasket • Blinkit • Zepto",
+              company: "BigBasket",
               color: "#FFF9ED",
             },
+          ].map((deal) => {
+            const coupon = coupons?.find(
+              (c) => c.company?.name === deal.company
+            );
 
-          ].map((deal) => (
-
-            <div
-              key={deal.title}
-              style={{
-                background: deal.color,
-                borderRadius: 24,
-                display: "flex",
-                alignItems: "center",
-                overflow: "hidden",
-                padding: 20,
-                boxShadow: "0 10px 30px rgba(0,0,0,.06)",
-              }}
-            >
-
-              <img
-                src={deal.image}
-                alt={deal.title}
-                style={{
-                  width: 170,
-                  height: 170,
-                  objectFit: "cover",
-                  borderRadius: 18,
-                }}
-              />
+            return (
 
               <div
+                key={deal.title}
                 style={{
-                  marginLeft: 24,
-                  flex: 1,
+                  background: deal.color,
+                  borderRadius: 24,
+                  display: "flex",
+                  alignItems: "center",
+                  overflow: "hidden",
+                  padding: 20,
+                  boxShadow: "0 10px 30px rgba(0,0,0,.06)",
                 }}
               >
 
-                <div
+                <img
+                  src={deal.image}
+                  alt={deal.title}
                   style={{
-                    background: "#fff",
-                    display: "inline-block",
-                    padding: "6px 14px",
-                    borderRadius: 20,
-                    color: "#E4A817",
-                    fontWeight: 700,
-                    marginBottom: 12,
+                    width: 170,
+                    height: 170,
+                    objectFit: "cover",
+                    borderRadius: 18,
                   }}
-                >
-                  Weekly Deal
-                </div>
-
-                <h3
-                  style={{
-                    fontSize: 26,
-                    marginBottom: 10,
-                  }}
-                >
-                  {deal.title}
-                </h3>
+                />
 
                 <div
                   style={{
-                    color: "#E4A817",
-                    fontSize: 20,
-                    fontWeight: 800,
-                    marginBottom: 12,
+                    marginLeft: 24,
+                    flex: 1,
                   }}
                 >
-                  {deal.subtitle}
+
+                  <div
+                    style={{
+                      background: "#fff",
+                      display: "inline-block",
+                      padding: "6px 14px",
+                      borderRadius: 20,
+                      color: "#E4A817",
+                      fontWeight: 700,
+                      marginBottom: 12,
+                    }}
+                  >
+                    Weekly Deal
+                  </div>
+
+                  <h3
+                    style={{
+                      fontSize: 26,
+                      marginBottom: 10,
+                    }}
+                  >
+                    {deal.title}
+                  </h3>
+
+                  <div
+                    style={{
+                      color: "#E4A817",
+                      fontSize: 20,
+                      fontWeight: 800,
+                      marginBottom: 12,
+                    }}
+                  >
+                    {deal.subtitle}
+                  </div>
+
+                  <p
+                    style={{
+                      color: "#666",
+                      marginBottom: 18,
+                    }}
+                  >
+                    {deal.brands}
+                  </p>
+
+                  <button
+                    onClick={() => {
+                      if (coupon) {
+                        navigate(`/coupons/${coupon.id}`);
+                      } else {
+                        alert("Coupon not available.");
+                      }
+                    }}
+                    style={{
+                      background: "#E4A817",
+                      color: "#fff",
+                      border: "none",
+                      padding: "12px 26px",
+                      borderRadius: 12,
+                      cursor: "pointer",
+                      fontWeight: 700,
+                    }}
+                  >
+                    Explore →
+                  </button>
+
                 </div>
-
-                <p
-                  style={{
-                    color: "#666",
-                    marginBottom: 18,
-                  }}
-                >
-                  {deal.brands}
-                </p>
-
-                <button
-                  style={{
-                    background: "#E4A817",
-                    color: "#fff",
-                    border: "none",
-                    padding: "12px 26px",
-                    borderRadius: 12,
-                    cursor: "pointer",
-                    fontWeight: 700,
-                  }}
-                >
-                  Explore →
-                </button>
 
               </div>
-
-            </div>
-
-          ))}
+            );
+          })}
 
         </div>
 
@@ -981,6 +1137,34 @@ useEffect(() => {
                   if (card.title === "Spin & Win") {
                     setShowSpinModal(true);
                   }
+
+                  if (card.title === "Scratch Card") {
+                    setScratchReward("");
+
+                    setScratchRevealed(false);
+
+                    const rewards = [
+                      "₹100 OFF Coupon",
+                      "₹250 Cashback",
+                      "15% OFF Coupon",
+                      "Free Delivery",
+                      "Mystery Gift",
+                      "Better Luck Next Time",
+                    ];
+
+                    const random =
+                      rewards[Math.floor(Math.random() * rewards.length)];
+
+                    setScratchReward(random);
+
+                    setShowScratchModal(true);
+                  }
+                  if (card.title === "Daily Check-In") {
+                    setShowCheckInModal(true);
+                  }
+                  if (card.title === "Refer & Earn") {
+                    setShowReferModal(true);
+                  }
                 }}
                 style={{
                   background: "#E4A817",
@@ -1033,15 +1217,6 @@ useEffect(() => {
             </p>
           </div>
 
-          <div className="grid grid-auto">
-            {filtered.map((c) => (
-              <CouponCard
-                key={c.id}
-                coupon={c}
-                onView={() => navigate(`/coupons/${c.id}`)}
-              />
-            ))}
-          </div>
         </>
       )}
 
@@ -1173,11 +1348,13 @@ useEffect(() => {
                 </div>
 
                 <button
+                  onClick={claimSpinReward}
                   style={{
-                    padding: "12px 30px",
+                    marginTop: 20,
                     background: "#E4A817",
                     color: "#fff",
                     border: "none",
+                    padding: "12px 28px",
                     borderRadius: 12,
                     cursor: "pointer",
                     fontWeight: 700,
@@ -1187,10 +1364,501 @@ useEffect(() => {
                 </button>
               </div>
             )}
-          </div>     
-        </div>        
-      )}   
+          </div>
+        </div>
+      )}
+      {showScratchModal && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,.55)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              width: 500,
+              background: "#fff",
+              borderRadius: 30,
+              padding: 35,
+              textAlign: "center",
+              position: "relative",
+            }}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setShowScratchModal(false)}
+              style={{
+                position: "absolute",
+                top: 18,
+                right: 20,
+                border: "none",
+                background: "none",
+                fontSize: 24,
+                cursor: "pointer",
+              }}
+            >
+              ✕
+            </button>
 
-    </div> 
+            <h2
+              style={{
+                fontSize: 34,
+                marginBottom: 25,
+              }}
+            >
+              🎫 Scratch Card
+            </h2>
+
+            <p
+              style={{
+                color: "#666",
+                marginBottom: 25,
+              }}
+            >
+              Scratch the silver area to reveal today's reward!
+            </p>
+
+            {/* Scratch Area */}
+            <div
+              style={{
+                width: 320,
+                height: 180,
+                margin: "0 auto",
+                borderRadius: 20,
+                overflow: "hidden",
+              }}
+            >
+              <ScratchCard
+                width={320}
+                height={180}
+                cover="/images/scratch-layer.png"
+                percent={50}
+                onComplete={() => setScratchRevealed(true)}
+              >
+                <div
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    background: "linear-gradient(135deg,#FFF8D9,#FFE082)",
+                    borderRadius: 20,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  }}
+                >
+                  <div style={{ fontSize: 50 }}>🎉</div>
+
+                  <h2
+                    style={{
+                      color: "#D89B17",
+                      fontSize: 28,
+                      fontWeight: 800,
+                    }}
+                  >
+                    {scratchReward}
+                  </h2>
+
+                  <p>Congratulations!</p>
+                </div>
+              </ScratchCard>
+            </div>
+
+            {scratchRevealed && (
+              <div
+                style={{
+                  marginTop: 30,
+                  padding: 20,
+                  background: "#FFF8D9",
+                  borderRadius: 18,
+                }}
+              >
+                <h3
+                  style={{
+                    color: "#E4A817",
+                  }}
+                >
+                  🎉 Congratulations!
+                </h3>
+
+                <h2>{scratchReward}</h2>
+
+                <button
+                  onClick={claimScratchReward}
+                  style={{
+                    marginTop: 20,
+                    background: "#E4A817",
+                    color: "#fff",
+                    border: "none",
+                    padding: "12px 28px",
+                    borderRadius: 12,
+                    cursor: "pointer",
+                    fontWeight: 700,
+                  }}
+                >
+                  Claim Reward
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      {showCheckInModal && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,.55)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              width: 550,
+              background: "#fff",
+              borderRadius: 30,
+              padding: 35,
+              position: "relative",
+              textAlign: "center",
+            }}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setShowCheckInModal(false)}
+              style={{
+                position: "absolute",
+                top: 18,
+                right: 20,
+                border: "none",
+                background: "none",
+                fontSize: 24,
+                cursor: "pointer",
+              }}
+            >
+              ✕
+            </button>
+
+            <h2
+              style={{
+                fontSize: 34,
+                marginBottom: 10,
+              }}
+            >
+              📅 Daily Check-In
+            </h2>
+
+            <p
+              style={{
+                color: "#666",
+                marginBottom: 30,
+              }}
+            >
+              Check in every day and build your reward streak!
+            </p>
+
+            {/* 7-Day Calendar */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(7,1fr)",
+                gap: 12,
+                marginBottom: 30,
+              }}
+            >
+              {Array.from({ length: 7 }, (_, i) => (
+                <div
+                  key={i}
+                  style={{
+                    background: i + 1 === currentDay ? "#FFF4D6" : "#F5F5F5",
+                    border:
+                      i + 1 === currentDay
+                        ? "2px solid #E4A817"
+                        : "2px solid transparent",
+                    borderRadius: 16,
+                    padding: "16px 10px",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontWeight: 700,
+                      marginBottom: 8,
+                    }}
+                  >
+                    Day {i + 1}
+                  </div>
+
+                  <div style={{ fontSize: 28 }}>
+                    {claimedDays.includes(i + 1) ? "✅" : "🎁"}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Reward Box */}
+            <div
+              style={{
+                background: "#FFF8D9",
+                borderRadius: 18,
+                padding: 20,
+                marginBottom: 25,
+              }}
+            >
+              <h3
+                style={{
+                  color: "#E4A817",
+                  marginBottom: 10,
+                }}
+              >
+                Today's Reward
+              </h3>
+
+              <h2 style={{ margin: 0 }}>
+                {dailyRewards[currentDay - 1]}
+              </h2>
+            </div>
+
+            {/* Claim Button */}
+            <button
+              onClick={handleDailyCheckIn}
+              disabled={todayClaimed}
+              style={{
+                background: todayClaimed ? "#999" : "#E4A817",
+                color: "#fff",
+                border: "none",
+                padding: "14px 34px",
+                borderRadius: 14,
+                fontWeight: 700,
+                fontSize: 16,
+                cursor: todayClaimed ? "not-allowed" : "pointer",
+              }}
+            >
+              {todayClaimed ? "✅ Claimed Today" : "Claim Today's Reward"}
+            </button>
+            {todayClaimed && (
+              <div
+                style={{
+                  marginTop: 25,
+                  padding: 18,
+                  background: "#FFF8D9",
+                  borderRadius: 16,
+                }}
+              >
+                <h3 style={{ color: "#E4A817", marginBottom: 10 }}>
+                  🎉 Reward Collected!
+                </h3>
+
+                <h2>{checkInReward}</h2>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      {showReferModal && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,.55)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              width: 560,
+              background: "#fff",
+              borderRadius: 30,
+              padding: 35,
+              position: "relative",
+              textAlign: "center",
+            }}
+          >
+            {/* Close */}
+            <button
+              onClick={() => setShowReferModal(false)}
+              style={{
+                position: "absolute",
+                top: 18,
+                right: 20,
+                border: "none",
+                background: "none",
+                fontSize: 24,
+                cursor: "pointer",
+              }}
+            >
+              ✕
+            </button>
+
+            <h2
+              style={{
+                fontSize: 34,
+                marginBottom: 10,
+              }}
+            >
+              👥 Refer & Earn
+            </h2>
+
+            <p
+              style={{
+                color: "#666",
+                marginBottom: 30,
+              }}
+            >
+              Invite your friends and both of you get exciting rewards!
+            </p>
+
+            {/* Rewards */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 20,
+                marginBottom: 30,
+              }}
+            >
+              <div
+                style={{
+                  background: "#FFF8D9",
+                  borderRadius: 18,
+                  padding: 20,
+                }}
+              >
+                <div style={{ fontSize: 40 }}>🎁</div>
+
+                <h3 style={{ color: "#E4A817" }}>You Earn</h3>
+
+                <h2>500 Points</h2>
+              </div>
+
+              <div
+                style={{
+                  background: "#EEF8FF",
+                  borderRadius: 18,
+                  padding: 20,
+                }}
+              >
+                <div style={{ fontSize: 40 }}>💸</div>
+
+                <h3 style={{ color: "#2196F3" }}>Friend Gets</h3>
+
+                <h2>₹100 OFF</h2>
+              </div>
+            </div>
+
+            {/* Referral Code */}
+            <div
+              style={{
+                background: "#F8F8F8",
+                borderRadius: 18,
+                padding: 25,
+                marginBottom: 25,
+              }}
+            >
+              <p
+                style={{
+                  marginBottom: 10,
+                  color: "#777",
+                }}
+              >
+                Your Referral Code
+              </p>
+
+              <h1
+                style={{
+                  letterSpacing: 4,
+                  color: "#E4A817",
+                  margin: 0,
+                }}
+              >
+                {referralCode}
+              </h1>
+            </div>
+
+            {/* Buttons */}
+            <div
+              style={{
+                display: "flex",
+                gap: 15,
+                justifyContent: "center",
+                marginBottom: 30,
+              }}
+            >
+              <button
+                onClick={copyReferralCode}
+                style={{
+                  background: "#E4A817",
+                  color: "#fff",
+                  border: "none",
+                  padding: "14px 28px",
+                  borderRadius: 14,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                {copied ? "✅ Copied!" : "📋 Copy Code"}
+              </button>
+
+              <button
+                onClick={shareReferral}
+                style={{
+                  background: "#2196F3",
+                  color: "#fff",
+                  border: "none",
+                  padding: "14px 28px",
+                  borderRadius: 14,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                📤 Share Now
+              </button>
+            </div>
+
+            {/* Stats */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 20,
+              }}
+            >
+              <div
+                style={{
+                  background: "#FFF8D9",
+                  borderRadius: 16,
+                  padding: 20,
+                }}
+              >
+                <h2 style={{ color: "#E4A817", margin: 0 }}>12</h2>
+                <p>Total Referrals</p>
+              </div>
+
+              <div
+                style={{
+                  background: "#EEF8FF",
+                  borderRadius: 16,
+                  padding: 20,
+                }}
+              >
+                <h2 style={{ color: "#2196F3", margin: 0 }}>6000</h2>
+                <p>Reward Points</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+    </div>
   );
 }
