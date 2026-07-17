@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { type Coupon } from "../lib/types";
 import {
   Bookmark,

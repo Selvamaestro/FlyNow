@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, Wallet, TrendingUp, Clock } from "lucide-react";
+import { Search } from "lucide-react";
 import QRCode from "react-qr-code";
 import { useAuth } from "../../lib/auth-context";
 import { savedCouponService } from "../../lib/services";
@@ -33,13 +33,13 @@ export default function WalletPage() {
             try {
                 setLoading(true);
 
-                const data = await savedCouponService.list(profile.id);
+                const data = await savedCouponService.list(profile!.id);
 
                 setSavedCoupons(data);
                 const { data: rewardData } = await supabase
                     .from("user_rewards")
                     .select("*")
-                    .eq("user_id", profile.id)
+                    .eq("user_id", profile!.id)
                     .order("created_at", { ascending: false });
 
                 setRewards(rewardData || []);
@@ -104,7 +104,6 @@ export default function WalletPage() {
     }, [filteredCoupons]);
 
     // Expiring Soon
-
     const expiringSoon = useMemo(() => {
         const today = new Date();
 
@@ -120,6 +119,7 @@ export default function WalletPage() {
             return diff >= 0 && diff <= 7;
         }).length;
     }, [filteredCoupons]);
+
 
     if (loading) {
         return (
@@ -448,7 +448,7 @@ Check it out on FlyNow!
                                 fontWeight: 800,
                             }}
                         >
-                            ₹{totalSavings}
+                            ₹{totalSavings.toFixed(2)}
                         </h2>
 
                         <div
@@ -723,7 +723,7 @@ Check it out on FlyNow!
                                         }}
                                     >
                                         <img
-                                            src={coupon.company?.logo_url}
+                                            src={coupon.company?.logo_url || undefined}
                                             alt=""
                                             style={{
                                                 width: 42,
@@ -1249,7 +1249,7 @@ Check it out on FlyNow!
                                         }}
                                     >
                                         <img
-                                            src={coupon.company?.logo_url}
+                                            src={coupon.company?.logo_url || undefined}
                                             alt={coupon.company?.name}
                                             style={{
                                                 width: 60,
@@ -1450,7 +1450,7 @@ Check it out on FlyNow!
                             }}
                         >
                             <img
-                                src={selectedCoupon.coupon.company?.logo_url}
+                                src={selectedCoupon.coupon.company?.logo_url || undefined}
                                 alt=""
                                 style={{
                                     width: 64,

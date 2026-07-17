@@ -3,9 +3,9 @@ import { useAuth } from '../../lib/auth-context';
 import { useToast } from '../../lib/toast-context';
 import { supabase } from '../../lib/supabase';
 import type { Profile } from '../../lib/types';
-import { 
+import {
   User, Shield, Bell, Download, Trash2,
-  Pencil, Check, X, Camera, Globe, MapPin, 
+  Pencil, Check, X, Camera, Globe, MapPin,
   Smartphone, FileText, AlertTriangle, Key,
   Bookmark
 } from 'lucide-react';
@@ -19,7 +19,7 @@ import { PageLoader } from '../../components/Spinner';
 export default function ProfilePage() {
   const { profile, refreshProfile, signOut } = useAuth();
   const { show } = useToast();
-  
+
   // Current active tab state
   const [activeTab, setActiveTab] = useState<'profile' | 'saved' | 'security' | 'notifications' | 'export' | 'delete'>('profile');
 
@@ -57,7 +57,7 @@ export default function ProfilePage() {
   // Form states initialized with database profile or local fallbacks
   const [displayName, setDisplayName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
-  
+
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
@@ -110,7 +110,7 @@ export default function ProfilePage() {
   // Generalized Profile update helper (saves to DB and fallback localStorage)
   const handleUpdateProfile = async (updatedFields: Partial<Profile>, sectionName: string) => {
     setSaving(true);
-    
+
     // Save to LocalStorage fallback first so the user does not lose changes if DB fails
     const localKey = `profile_fallback_${profile.id}`;
     let existingFallback = {};
@@ -187,15 +187,15 @@ export default function ProfilePage() {
   const changePw = async () => {
     if (pw !== confirm) { show('Passwords do not match', 'error'); return; }
     if (pw.length < 6) { show('Password must be at least 6 characters', 'error'); return; }
-    
+
     setSaving(true);
     const { error } = await supabase.auth.updateUser({ password: pw });
     setSaving(false);
-    
-    if (error) { 
-      show(error.message, 'error'); 
+
+    if (error) {
+      show(error.message, 'error');
     } else {
-      setPw(''); 
+      setPw('');
       setConfirm('');
       show('Password updated successfully', 'success');
     }
@@ -210,7 +210,7 @@ export default function ProfilePage() {
     setSaving(true);
     const ext = file.name.split('.').pop();
     const filePath = `avatars/${profile.id}.${ext}`;
-    
+
     const { error: uploadError } = await supabase.storage
       .from('flyers')
       .upload(filePath, file, { upsert: true });
@@ -223,7 +223,7 @@ export default function ProfilePage() {
 
     const { data } = supabase.storage.from('flyers').getPublicUrl(filePath);
     setAvatarUrl(data.publicUrl);
-    
+
     // Save to profile
     await handleUpdateProfile({ avatar_url: data.publicUrl }, 'Profile image');
     setSaving(false);
@@ -236,7 +236,7 @@ export default function ProfilePage() {
     let fallbackData = {};
     try {
       fallbackData = JSON.parse(localStorage.getItem(localKey) || '{}');
-    } catch {}
+    } catch { }
 
     const fullExport = {
       exported_at: new Date().toISOString(),
@@ -333,7 +333,7 @@ export default function ProfilePage() {
 
         {/* Right Details Panel */}
         <div className="profile-content">
-          
+
           {/* ===================== MY PROFILE TAB ===================== */}
           {activeTab === 'profile' && (
             <>
@@ -358,7 +358,7 @@ export default function ProfilePage() {
                       }}>
                         {!avatarUrl && (displayName?.[0]?.toUpperCase() || profile.role?.[0]?.toUpperCase() || 'U')}
                       </div>
-                      <button 
+                      <button
                         onClick={() => fileInputRef.current?.click()}
                         style={{
                           position: 'absolute',
@@ -379,10 +379,10 @@ export default function ProfilePage() {
                       >
                         <Camera size={14} />
                       </button>
-                      <input 
-                        type="file" 
-                        ref={fileInputRef} 
-                        style={{ display: 'none' }} 
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        style={{ display: 'none' }}
                         accept="image/*"
                         onChange={handleAvatarUpload}
                       />
@@ -390,12 +390,12 @@ export default function ProfilePage() {
 
                     {editingTop ? (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                        <input 
-                          className="input" 
-                          style={{ padding: '6px 12px', minWidth: 200 }} 
+                        <input
+                          className="input"
+                          style={{ padding: '6px 12px', minWidth: 200 }}
                           value={displayName}
                           placeholder="Display Name"
-                          onChange={(e) => setDisplayName(e.target.value)} 
+                          onChange={(e) => setDisplayName(e.target.value)}
                         />
                         <span className="badge badge-primary" style={{ width: 'fit-content' }}>{profile.role.toUpperCase()}</span>
                       </div>
@@ -579,23 +579,23 @@ export default function ProfilePage() {
                 {loadingSaved ? (
                   <PageLoader />
                 ) : (saved ?? []).length === 0 ? (
-                  <EmptyState 
-                    title="No saved coupons yet" 
-                    message="Tap the bookmark icon on any coupon to save it here." 
-                    action={<button className="btn btn-primary" onClick={() => navigate('/offers')}>Browse Offers</button>} 
+                  <EmptyState
+                    title="No saved coupons yet"
+                    message="Tap the bookmark icon on any coupon to save it here."
+                    action={<button className="btn btn-primary" onClick={() => navigate('/offers')}>Browse Offers</button>}
                   />
                 ) : (
                   <div className="grid grid-auto">
                     {(saved ?? []).map((s) => (
-                      <CouponCard 
-                        key={s.id} 
-                        coupon={s.coupon!} 
-                        saved 
-                        onView={() => navigate(`/coupons/${s.coupon_id}`)} 
-                        onToggleSave={async () => { 
-                          await savedCouponService.toggle(profile.id, s.coupon_id); 
-                          reloadSaved(); 
-                        }} 
+                      <CouponCard
+                        key={s.id}
+                        coupon={s.coupon!}
+                        saved
+                        onView={() => navigate(`/coupons/${s.coupon_id}`)}
+                        onToggleSave={async () => {
+                          await savedCouponService.toggle(profile.id, s.coupon_id);
+                          reloadSaved();
+                        }}
                       />
                     ))}
                   </div>
@@ -727,7 +727,7 @@ export default function ProfilePage() {
               <p style={{ color: 'var(--text-muted)', fontSize: 14, lineHeight: '1.6', marginBottom: 20 }}>
                 In compliance with GDPR and privacy standards, you can request an export of all information saved in your FlyNow profile. This includes account metadata, personal details, addresses, and notification settings.
               </p>
-              
+
               <div style={{
                 display: 'flex',
                 gap: 16,
@@ -780,18 +780,18 @@ export default function ProfilePage() {
 
               <div className="field mb-24" style={{ maxWidth: 420 }}>
                 <label className="label" style={{ color: 'var(--text)' }}>Type <strong>DELETE</strong> below to confirm deletion</label>
-                <input 
-                  className="input" 
-                  value={deleteConfirmText} 
-                  onChange={(e) => setDeleteConfirmText(e.target.value)} 
-                  placeholder="Type DELETE" 
+                <input
+                  className="input"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder="Type DELETE"
                   style={{ border: deleteConfirmText === 'DELETE' ? '1.5px solid var(--danger)' : '1px solid var(--border)' }}
                 />
               </div>
 
-              <button 
-                className="btn btn-danger" 
-                onClick={handleDeleteAccount} 
+              <button
+                className="btn btn-danger"
+                onClick={handleDeleteAccount}
                 disabled={deleteConfirmText !== 'DELETE'}
                 style={{ opacity: deleteConfirmText === 'DELETE' ? 1 : 0.5 }}
               >

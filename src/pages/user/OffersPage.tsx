@@ -1,6 +1,6 @@
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAsync } from '../../lib/use-async';
-import { couponService, categoryService } from '../../lib/services';
+import { couponService } from '../../lib/services';
 import EmptyState from '../../components/EmptyState';
 import { PageLoader } from '../../components/Spinner';
 import { useEffect, useMemo, useRef, useState } from "react";

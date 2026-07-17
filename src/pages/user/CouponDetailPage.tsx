@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Calendar, Tag, Building2, FileText, Bookmark, ArrowLeft, Copy, Check, Eye } from 'lucide-react';
+import { Calendar, Building2, FileText, Bookmark, ArrowLeft, Copy, Check, Eye } from 'lucide-react';
 import { couponService, savedCouponService } from '../../lib/services';
 import { useAuth } from '../../lib/auth-context';
 import { useToast } from '../../lib/toast-context';
 import type { Coupon } from '../../lib/types';
-import { formatDate, daysUntil, isExpired } from '../../lib/utils';
+import { formatDate, isExpired } from '../../lib/utils';
 import { PageLoader } from '../../components/Spinner';
 
 export default function CouponDetailPage() {
@@ -17,27 +17,11 @@ export default function CouponDetailPage() {
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [relatedCoupons, setRelatedCoupons] = useState<Coupon[]>([]);
 
   useEffect(() => {
     if (!id) return;
     couponService.get(id).then((c) => {
       setCoupon(c);
-      if (c?.category_id) {
-        couponService
-          .listApproved()
-          .then((coupons) => {
-            const related = coupons
-              .filter(
-                (item) =>
-                  item.category_id === c.category_id &&
-                  item.id !== c.id
-              )
-              .slice(0, 3);
-
-            setRelatedCoupons(related);
-          });
-      }
       setLoading(false);
       if (c) couponService.incrementViews(id);
     });
