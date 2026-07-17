@@ -86,7 +86,7 @@ export default function CompanyNotificationsPage() {
       ) : notifs.length === 0 ? (
         <EmptyState icon={<Bell size={48} />} title="No notifications yet" />
       ) : (
-        <div className="flex-col gap-12" style={{ maxWidth: 850 }}>
+        <div className="flex-col gap-12">
           {notifs.map((n) => {
             const Icon = iconFor(n.type);
             const isApproved = n.type.includes('approval') || n.title.toLowerCase().includes('approved');
