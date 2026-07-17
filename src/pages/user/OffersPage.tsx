@@ -7,6 +7,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Confetti from "react-confetti";
 import ScratchCard from "lesca-react-scratch-card";
 import { supabase } from "../../lib/supabase";
+import { 
+  Flame, Zap, ShieldCheck, Coins, Clock, Star, Gift, 
+  Ticket, Calendar, Users, Copy, Share2, Sparkles, 
+  CheckCircle 
+} from 'lucide-react';
 
 export default function OffersPage() {
   const navigate = useNavigate();
@@ -218,13 +223,13 @@ export default function OffersPage() {
     }, 5000);
   };
   const dailyRewards = [
-    "⭐ 50 Reward Points",
-    "🎫 10% OFF Coupon",
-    "💰 ₹100 Cashback",
-    "⭐ 100 Reward Points",
-    "🚚 Free Delivery",
-    "🎁 Mystery Gift",
-    "🏆 Premium Reward Box",
+    "50 Reward Points",
+    "10% OFF Coupon",
+    "₹100 Cashback",
+    "100 Reward Points",
+    "Free Delivery",
+    "Mystery Gift",
+    "Premium Reward Box",
   ];
   const handleDailyCheckIn = async () => {
     if (todayClaimed) return;
@@ -366,7 +371,9 @@ https://flynow.com`;
         <div>
           <div
             style={{
-              display: "inline-block",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
               background: "#fff",
               color: "#D99000",
               padding: "8px 18px",
@@ -375,7 +382,7 @@ https://flynow.com`;
               marginBottom: 18,
             }}
           >
-            🔥 LIVE TODAY
+            <Flame size={16} color="#D99000" fill="#D99000" /> LIVE TODAY
           </div>
 
           <h1
@@ -411,21 +418,25 @@ https://flynow.com`;
             }}
           >
             {[
-              "⚡ Live Offers",
-              "🎁 Verified Coupons",
-              "💰 Extra Cashback",
-              "🔥 Flash Deals",
+              { label: "Live Offers", icon: Zap, color: "#E4A817" },
+              { label: "Verified Coupons", icon: ShieldCheck, color: "#4CAF50" },
+              { label: "Extra Cashback", icon: Coins, color: "#FF9800" },
+              { label: "Flash Deals", icon: Flame, color: "#FF5722" },
             ].map((item) => (
               <div
-                key={item}
+                key={item.label}
                 style={{
                   background: "#fff",
                   padding: "10px 18px",
                   borderRadius: 30,
                   fontWeight: 600,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
                 }}
               >
-                {item}
+                <item.icon size={16} color={item.color} />
+                {item.label}
               </div>
             ))}
           </div>
@@ -464,9 +475,12 @@ https://flynow.com`;
               style={{
                 fontSize: 34,
                 fontWeight: 800,
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
               }}
             >
-              🔥 Today's Live Sale
+              <Flame size={32} color="#D89B17" fill="#D89B17" /> Today's Live Sale
             </h2>
 
             <p
@@ -503,9 +517,13 @@ https://flynow.com`;
                   fontSize: 12,
                   fontWeight: 700,
                   marginBottom: 4,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 6,
                 }}
               >
-                ⏰ ENDS TODAY
+                <Clock size={12} color="#D89B17" /> ENDS TODAY
               </div>
 
               <div
@@ -663,9 +681,12 @@ https://flynow.com`;
               style={{
                 fontSize: 34,
                 fontWeight: 800,
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
               }}
             >
-              🔥 Weekly Deals
+              <Flame size={32} color="#D89B17" fill="#D89B17" /> Weekly Deals
             </h2>
 
             <p
@@ -863,9 +884,12 @@ https://flynow.com`;
               style={{
                 fontSize: 34,
                 fontWeight: 800,
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
               }}
             >
-              🌟 Monthly Mega Offers
+              <Star size={32} color="#D89B17" fill="#D89B17" /> Monthly Mega Offers
             </h2>
 
             <p
@@ -1032,9 +1056,13 @@ https://flynow.com`;
               fontSize: 38,
               fontWeight: 800,
               marginBottom: 12,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 12,
             }}
           >
-            🎁 Reward Zone
+            <Gift size={36} color="#D89B17" fill="#D89B17" /> Reward Zone
           </h2>
 
           <p
@@ -1061,31 +1089,39 @@ https://flynow.com`;
               title: "Spin & Win",
               desc: "Spin once every day and win coupons.",
               color: "#FFF7E2",
-              btn: "🎡 Spin Now"
+              btn: "🎡 Spin Now",
+              icon: null,
+              iconColor: ""
             },
 
             {
-              emoji: "🎫",
+              icon: Ticket,
+              iconColor: "#9C27B0",
               title: "Scratch Card",
               desc: "Scratch today's lucky card.",
               color: "#F4EEFF",
               btn: "Scratch",
+              emoji: ""
             },
 
             {
-              emoji: "📅",
+              icon: Calendar,
+              iconColor: "#4CAF50",
               title: "Daily Check-In",
               desc: "Login daily and collect rewards.",
               color: "#EAFBF2",
               btn: "Claim",
+              emoji: ""
             },
 
             {
-              emoji: "👥",
+              icon: Users,
+              iconColor: "#2196F3",
               title: "Refer & Earn",
               desc: "Invite friends and earn 500 points.",
               color: "#EAF4FF",
               btn: "Invite",
+              emoji: ""
             },
 
           ].map((card) => (
@@ -1104,11 +1140,22 @@ https://flynow.com`;
 
               <div
                 style={{
-                  fontSize: 58,
+                  display: "inline-flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: 72,
+                  height: 72,
+                  borderRadius: "50%",
+                  background: card.icon ? "#fff" : "transparent",
+                  boxShadow: card.icon ? "0 8px 20px rgba(0,0,0,0.05)" : "none",
                   marginBottom: 18,
                 }}
               >
-                {card.emoji}
+                {card.icon ? (
+                  <card.icon size={36} color={card.iconColor} />
+                ) : (
+                  <span style={{ fontSize: 58 }}>{card.emoji}</span>
+                )}
               </div>
 
               <h3
@@ -1202,7 +1249,16 @@ https://flynow.com`;
               textAlign: "center",
             }}
           >
-            <h2>💛 Keep Saving with FlyNow</h2>
+            <h2
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 10,
+              }}
+            >
+              <Star size={24} color="#D89B17" fill="#D89B17" /> Keep Saving with FlyNow
+            </h2>
             <p>
               Discover more verified offers and unlock bigger savings every day.
             </p>
@@ -1332,9 +1388,13 @@ https://flynow.com`;
                   style={{
                     marginBottom: 10,
                     color: "#E4A817",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8,
                   }}
                 >
-                  🎉 Congratulations!
+                  <Sparkles size={24} color="#E4A817" /> Congratulations!
                 </h2>
 
                 <div
@@ -1409,9 +1469,13 @@ https://flynow.com`;
               style={{
                 fontSize: 34,
                 marginBottom: 25,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 10,
               }}
             >
-              🎫 Scratch Card
+              <Ticket size={30} color="#E4A817" /> Scratch Card
             </h2>
 
             <p
@@ -1453,7 +1517,20 @@ https://flynow.com`;
                     textAlign: "center",
                   }}
                 >
-                  <div style={{ fontSize: 50 }}>🎉</div>
+                  <div
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 64,
+                      height: 64,
+                      borderRadius: "50%",
+                      background: "#FFF4D6",
+                      marginBottom: 10,
+                    }}
+                  >
+                    <Sparkles size={32} color="#D89B17" />
+                  </div>
 
                   <h2
                     style={{
@@ -1482,9 +1559,13 @@ https://flynow.com`;
                 <h3
                   style={{
                     color: "#E4A817",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8,
                   }}
                 >
-                  🎉 Congratulations!
+                  <Sparkles size={20} color="#E4A817" /> Congratulations!
                 </h3>
 
                 <h2>{scratchReward}</h2>
@@ -1551,9 +1632,13 @@ https://flynow.com`;
               style={{
                 fontSize: 34,
                 marginBottom: 10,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 10,
               }}
             >
-              📅 Daily Check-In
+              <Calendar size={30} color="#E4A817" /> Daily Check-In
             </h2>
 
             <p
@@ -1596,8 +1681,12 @@ https://flynow.com`;
                     Day {i + 1}
                   </div>
 
-                  <div style={{ fontSize: 28 }}>
-                    {claimedDays.includes(i + 1) ? "✅" : "🎁"}
+                  <div style={{ fontSize: 28, display: "flex", justifyContent: "center", marginTop: 4 }}>
+                    {claimedDays.includes(i + 1) ? (
+                      <CheckCircle size={24} color="#10B981" />
+                    ) : (
+                      <Gift size={24} color="#999" />
+                    )}
                   </div>
                 </div>
               ))}
@@ -1652,8 +1741,17 @@ https://flynow.com`;
                   borderRadius: 16,
                 }}
               >
-                <h3 style={{ color: "#E4A817", marginBottom: 10 }}>
-                  🎉 Reward Collected!
+                <h3
+                  style={{
+                    color: "#E4A817",
+                    marginBottom: 10,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8,
+                  }}
+                >
+                  <Sparkles size={20} color="#E4A817" /> Reward Collected!
                 </h3>
 
                 <h2>{checkInReward}</h2>
@@ -1704,9 +1802,13 @@ https://flynow.com`;
               style={{
                 fontSize: 34,
                 marginBottom: 10,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 12,
               }}
             >
-              👥 Refer & Earn
+              <Users size={30} color="#E4A817" /> Refer & Earn
             </h2>
 
             <p
@@ -1732,13 +1834,29 @@ https://flynow.com`;
                   background: "#FFF8D9",
                   borderRadius: 18,
                   padding: 20,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
                 }}
               >
-                <div style={{ fontSize: 40 }}>🎁</div>
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: 56,
+                    height: 56,
+                    borderRadius: "50%",
+                    background: "#fff",
+                    marginBottom: 10,
+                  }}
+                >
+                  <Gift size={28} color="#E4A817" />
+                </div>
 
-                <h3 style={{ color: "#E4A817" }}>You Earn</h3>
+                <h3 style={{ color: "#E4A817", margin: "4px 0" }}>You Earn</h3>
 
-                <h2>500 Points</h2>
+                <h2 style={{ margin: 0 }}>500 Points</h2>
               </div>
 
               <div
@@ -1746,13 +1864,29 @@ https://flynow.com`;
                   background: "#EEF8FF",
                   borderRadius: 18,
                   padding: 20,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
                 }}
               >
-                <div style={{ fontSize: 40 }}>💸</div>
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: 56,
+                    height: 56,
+                    borderRadius: "50%",
+                    background: "#fff",
+                    marginBottom: 10,
+                  }}
+                >
+                  <Coins size={28} color="#2196F3" />
+                </div>
 
-                <h3 style={{ color: "#2196F3" }}>Friend Gets</h3>
+                <h3 style={{ color: "#2196F3", margin: "4px 0" }}>Friend Gets</h3>
 
-                <h2>₹100 OFF</h2>
+                <h2 style={{ margin: 0 }}>₹100 OFF</h2>
               </div>
             </div>
 
@@ -1806,7 +1940,17 @@ https://flynow.com`;
                   cursor: "pointer",
                 }}
               >
-                {copied ? "✅ Copied!" : "📋 Copy Code"}
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                  {copied ? (
+                    <>
+                      <CheckCircle size={16} /> Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={16} /> Copy Code
+                    </>
+                  )}
+                </span>
               </button>
 
               <button
@@ -1821,7 +1965,9 @@ https://flynow.com`;
                   cursor: "pointer",
                 }}
               >
-                📤 Share Now
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                  <Share2 size={16} /> Share Now
+                </span>
               </button>
             </div>
 
