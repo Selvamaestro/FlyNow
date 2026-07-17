@@ -53,6 +53,7 @@ export interface Coupon {
   views: number;
   retail_price?: number | null;
   discount_price?: number | null;
+  is_flash?: boolean;
   created_at: string;
   // joined fields
 
