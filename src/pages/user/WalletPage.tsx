@@ -384,7 +384,7 @@ Check it out on FlyNow!
                         </h2>
 
                         <div style={{ color: "#999" }}>
-                            Active coupons saved
+                            Active coupons saved ({expiringSoon} expiring soon)
                         </div>
                     </div>
                 </div>

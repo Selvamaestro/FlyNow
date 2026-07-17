@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Sparkles, Flame, Zap, Clock, Star } from 'lucide-react';
 import { useAsync } from '../../lib/use-async';
 import { couponService, categoryService } from '../../lib/services';
 import { PageLoader } from '../../components/Spinner';
@@ -150,7 +150,7 @@ const exclusiveCoupons = [
           marginBottom: "25px",
         }}
       >
-        ⚡ Premium Digital Coupons
+        <Sparkles size={16} color="#D89B17" /> Premium Digital Coupons
       </div>
 
       <h1
@@ -437,9 +437,12 @@ const exclusiveCoupons = [
         style={{
           fontSize: 36,
           fontWeight: 800,
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
         }}
       >
-        🔥 Today's Top Offers
+        <Flame size={32} color="#D89B17" fill="#D89B17" /> Today's Top Offers
       </h2>
 
       <p
@@ -605,9 +608,12 @@ const exclusiveCoupons = [
                     fontSize: 34,
                     fontWeight: 700,
                     marginBottom: 8,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
                 }}
             >
-                ⚡ Flash Deals
+                <Zap size={30} color="#E4A817" fill="#E4A817" /> Flash Deals
             </h2>
 
             <p
@@ -730,9 +736,9 @@ const exclusiveCoupons = [
                                 }}
                             >
                                 {isDbCoupon ? (
-                                  <>⏱️ <FlashCountdown createdAt={deal.created_at} /></>
+                                  <><Clock size={16} /> <FlashCountdown createdAt={deal.created_at} /></>
                                 ) : (
-                                  deal.time
+                                  <><Clock size={16} /> {deal.time}</>
                                 )}
                             </span>
 
@@ -789,9 +795,12 @@ const exclusiveCoupons = [
                     fontSize: 34,
                     fontWeight: 700,
                     marginBottom: 8,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
                 }}
             >
-                ⭐ Exclusive Coupons
+                <Star size={30} color="#E4A817" fill="#E4A817" /> Exclusive Coupons
             </h2>
 
             <p
