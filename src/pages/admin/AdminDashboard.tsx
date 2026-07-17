@@ -1,11 +1,11 @@
 import { useAsync } from '../../lib/use-async';
-import { couponService, companyService, userService, notificationService } from '../../lib/services';
+import { couponService, companyService, categoryService, notificationService } from '../../lib/services';
 import DashboardLayout from '../../components/DashboardLayout';
 import { adminNav } from './admin-nav';
 import StatCard from '../../components/StatCard';
 import { BarChart, LineChart, DonutChart } from '../../components/Charts';
 import { PageLoader } from '../../components/Spinner';
-import { Users, Building2, Ticket, DollarSign, FileImage, Activity, CheckCircle2, Clock, XCircle } from 'lucide-react';
+import { FolderTree, Building2, Ticket, DollarSign, FileImage, Activity, CheckCircle2, Clock, XCircle } from 'lucide-react';
 import { useAuth } from '../../lib/auth-context';
 import { timeAgo } from '../../lib/utils';
 import { Link } from 'react-router-dom';
@@ -14,12 +14,12 @@ export default function AdminDashboard() {
   const { profile } = useAuth();
   const { data: coupons, loading } = useAsync(() => couponService.listAll(), []);
   const { data: companies } = useAsync(() => companyService.listAll(), []);
-  const { data: users } = useAsync(() => userService.list(), []);
+  const { data: categories } = useAsync(() => categoryService.list(), []);
   const { data: notifs } = useAsync(() => notificationService.listAll(), []);
 
   const cList = coupons ?? [];
   const coList = companies ?? [];
-  const uList = users ?? [];
+  const catList = categories ?? [];
   const pendingCoupons = cList.filter((c) => c.status === 'pending');
   const pendingCompanies = coList.filter((c) => c.status === 'pending');
   const approved = cList.filter((c) => c.status === 'approved').length;
@@ -39,7 +39,7 @@ export default function AdminDashboard() {
     return acc;
   }, {} as Record<string, { label: string; value: number; color: string }>)).slice(0, 6);
 
-  const health = uList.length > 0 && coList.length > 0 ? 'Healthy' : 'Needs Attention';
+  const health = coList.length > 0 ? 'Healthy' : 'Needs Attention';
 
   return (
     <DashboardLayout items={adminNav} brand="Admin">
@@ -51,7 +51,7 @@ export default function AdminDashboard() {
       {loading ? <PageLoader /> : (
         <>
           <div className="grid grid-4 mb-32">
-            <StatCard icon={Users} label="Total Users" value={uList.length} />
+            <StatCard icon={FolderTree} label="Categories" value={catList.length} />
             <StatCard icon={Building2} label="Companies" value={coList.length} bg="var(--info-light)" color="var(--info)" />
             <StatCard icon={Ticket} label="Total Coupons" value={cList.length} bg="var(--success-light)" color="var(--success)" />
             <StatCard icon={DollarSign} label="Revenue" value={`$${revenue}`} bg="var(--warning-light)" color="#B45309" />
@@ -89,19 +89,7 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div className="grid grid-2 mt-32" style={{ gap: 24 }}>
-            <div className="card card-body">
-              <h3 className="mb-16">Recent Users</h3>
-              <div className="flex-col gap-8">
-                {uList.slice(0, 5).map((u) => (
-                  <div key={u.id} className="flex items-center gap-12 card-body-sm" style={{ background: 'var(--bg)', borderRadius: 10 }}>
-                    <div className="stat-icon" style={{ width: 36, height: 36, background: 'var(--primary)', color: '#fff', borderRadius: '50%', fontSize: 13 }}>{u.display_name?.[0]?.toUpperCase()}</div>
-                    <div style={{ flex: 1 }}><div className="font-semibold text-sm">{u.display_name}</div><div className="text-xs text-muted">{u.role}</div></div>
-                    <span className="text-xs text-muted">{timeAgo(u.created_at)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+          <div className="grid grid-1 mt-32" style={{ gap: 24 }}>
             <div className="card card-body">
               <h3 className="mb-16">Recent Activity Timeline</h3>
               <div className="flex-col gap-8">
