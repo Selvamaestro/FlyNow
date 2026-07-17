@@ -29,8 +29,7 @@ export default function CompanyLoginPage() {
 
   return (
     <AuthLayout title="Company Portal" subtitle="Sign in to manage your flyers and coupons." icon={Building2} accentColor="#E4A817" accentGradient="linear-gradient(135deg, #E4A817, #D89B17)"
-      features={['Upload unlimited flyers', 'Track coupon performance', 'Real-time analytics dashboard', 'Manage your company profile']}
-      footerLink={{ to: '/register', label: "Don't have a company account?" }}>
+      features={['Upload unlimited flyers', 'Track coupon performance', 'Real-time analytics dashboard', 'Manage your company profile']}>
       {params.get('suspended') && <div className="badge badge-danger mb-16" style={{ padding: 12, width: '100%' }}><AlertCircle size={16} /> Your account has been suspended.</div>}
       <form onSubmit={submit} className="flex-col gap-16">
         <div className="field">

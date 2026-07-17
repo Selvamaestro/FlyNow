@@ -28,8 +28,7 @@ export default function LoginPage() {
   };
 
   return (
-    <AuthLayout title="Welcome Back" subtitle="Sign in to access your FlyNow account." icon={ShoppingBag} accentColor="var(--primary)" accentGradient="linear-gradient(135deg, #F4B000, #D89700)"
-      footerLink={{ to: '/register', label: "Don't have an account?" }}>
+    <AuthLayout title="Welcome Back" subtitle="Sign in to access your FlyNow account." icon={ShoppingBag} accentColor="var(--primary)" accentGradient="linear-gradient(135deg, #F4B000, #D89700)">
       {params.get('suspended') && <div className="badge badge-danger mb-16" style={{ padding: 12, width: '100%' }}><AlertCircle size={16} /> Your account has been suspended.</div>}
       <form onSubmit={submit} className="flex-col gap-16">
         <div className="field">

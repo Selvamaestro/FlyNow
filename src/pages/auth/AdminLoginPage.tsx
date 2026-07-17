@@ -29,8 +29,7 @@ export default function AdminLoginPage() {
 
   return (
     <AuthLayout title="Admin Portal" subtitle="Restricted access. Administrators only." icon={Shield} accentColor="#E4A817" accentGradient="linear-gradient(135deg, #E4A817, #D89B17)"
-      features={['Full platform management', 'Review and approve coupons', 'Manage companies and users', 'Analytics and revenue reports']}
-      footerLink={{ to: '/login', label: 'Not an admin? Back to' }}>
+      features={['Full platform management', 'Review and approve coupons', 'Manage companies and users', 'Analytics and revenue reports']}>
       {params.get('suspended') && <div className="badge badge-danger mb-16" style={{ padding: 12, width: '100%' }}><AlertCircle size={16} /> Your account has been suspended.</div>}
       <form onSubmit={submit} className="flex-col gap-16">
         <div className="field">
