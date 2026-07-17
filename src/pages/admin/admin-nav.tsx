@@ -1,4 +1,4 @@
-import { LayoutDashboard, FolderTree, Building2, Ticket, Users, FileBarChart, BarChart3, Bell, Settings } from 'lucide-react';
+import { LayoutDashboard, FolderTree, Building2, Ticket, FileBarChart, BarChart3, Bell, Settings } from 'lucide-react';
 import type { NavItem } from '../../components/DashboardLayout';
 
 export const adminNav: NavItem[] = [
