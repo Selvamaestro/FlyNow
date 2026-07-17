@@ -113,6 +113,13 @@ export default function UploadFlashSalePage() {
         target_role: 'admin',
         ref_id: company.id
       });
+      await notificationService.create({
+        type: 'coupon_pending',
+        title: 'Flash Sale Pending Review',
+        message: `Your flash sale "${form.title}" was submitted and is pending review.`,
+        target_role: 'company',
+        ref_id: company.id
+      });
       show('Flash Sale uploaded! Status: Pending review', 'success');
       navigate('/company/flyers');
     } catch (err) {

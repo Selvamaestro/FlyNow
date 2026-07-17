@@ -28,25 +28,87 @@ export default function LoginPage() {
   };
 
   return (
-    <AuthLayout title="Welcome Back" subtitle="Sign in to access your FlyNow account." icon={ShoppingBag} accentColor="var(--primary)" accentGradient="linear-gradient(135deg, #F4B000, #D89700)"
-      footerLink={{ to: '/register', label: "Don't have an account?" }}>
-      {params.get('suspended') && <div className="badge badge-danger mb-16" style={{ padding: 12, width: '100%' }}><AlertCircle size={16} /> Your account has been suspended.</div>}
-      <form onSubmit={submit} className="flex-col gap-16">
-        <div className="field">
-          <label className="label">Email</label>
-          <div className="flex items-center gap-8"><Mail size={18} style={{ color: 'var(--text-muted)' }} /><input className="input" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" /></div>
+    <AuthLayout
+      title="Sign in"
+      subtitle="Welcome back! Please enter your credentials."
+      icon={ShoppingBag}
+      variant="user"
+      leftTitle="New here?"
+      leftDesc="Join us today and discover a world of possibilities. Create your account in seconds!"
+      leftBtnLabel="SIGN UP"
+      leftBtnTo="/register"
+    >
+      {params.get('suspended') && (
+        <div className="auth-suspended">
+          <AlertCircle size={16} /> Your account has been suspended.
         </div>
-        <div className="field">
-          <label className="label">Password</label>
-          <div className="flex items-center gap-8"><Lock size={18} style={{ color: 'var(--text-muted)' }} /><input className="input" type={showPw ? 'text' : 'password'} required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />{password && <button type="button" onClick={() => setShowPw(!showPw)} className="btn-icon">{showPw ? <EyeOff size={16} /> : <Eye size={16} />}</button>}</div>
+      )}
+
+      {error && (
+        <div className="auth-error">
+          <AlertCircle size={16} /> {error}
         </div>
-        {error && <div className="field-error flex items-center gap-8"><AlertCircle size={14} /> {error}</div>}
-        <div className="flex items-center justify-between">
-          <Link to="/forgot-password" className="text-sm" style={{ color: 'var(--primary-dark)' }}>Forgot password?</Link>
+      )}
+
+      <form onSubmit={submit}>
+        <div className="auth-field">
+          <input
+            id="user-email"
+            className="auth-input"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+          />
+          <Mail size={18} className="auth-input-icon" />
         </div>
-        <button className="btn btn-primary btn-lg w-full" disabled={loading}>{loading ? 'Signing in...' : 'Sign In'}</button>
+
+        <div className="auth-field">
+          <input
+            id="user-password"
+            className="auth-input"
+            type={showPw ? 'text' : 'password'}
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+          />
+          <Lock size={18} className="auth-input-icon" />
+          {password && (
+            <button
+              type="button"
+              onClick={() => setShowPw(!showPw)}
+              className="auth-toggle-pw"
+              aria-label="Toggle password visibility"
+            >
+              {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          )}
+        </div>
+
+        <Link to="/forgot-password" className="auth-forgot">
+          Forgot password?
+        </Link>
+
+        <button
+          id="user-login-btn"
+          className="auth-submit-btn user-btn"
+          type="submit"
+          disabled={loading}
+        >
+          {loading && <span className="btn-spinner" />}
+          {loading ? 'Signing in...' : 'LOGIN'}
+        </button>
       </form>
-      <p className="text-center text-sm text-muted mt-24">Don't have an account? <Link to="/register" style={{ color: 'var(--primary-dark)', fontWeight: 600 }}>Sign up</Link></p>
+
+      <div className="auth-footer" style={{ marginTop: 32 }}>
+        <span>Do you have a business account? </span>
+        <Link to="/company/login">Company </Link>
+        <span> · </span>
+
+      </div>
     </AuthLayout>
   );
 }
+

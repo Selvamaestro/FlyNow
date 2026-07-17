@@ -1,42 +1,101 @@
 import { type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Tag, CheckCircle2 } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import '../../styles/auth.css';
 
 interface AuthLayoutProps {
   title: string;
   subtitle: string;
   children: ReactNode;
   icon?: LucideIcon;
-  accentColor?: string;
-  accentGradient?: string;
+  /** 'user' | 'company' | 'admin' – drives gradient + accent colours */
+  variant?: 'user' | 'company' | 'admin';
+  /** CTA for the left panel */
+  leftTitle?: string;
+  leftDesc?: string;
+  leftBtnLabel?: string;
+  leftBtnTo?: string;
   features?: string[];
-  footerLink?: { to: string; label: string };
 }
 
-export default function AuthLayout({ title, subtitle, children, icon: Icon = Tag, accentColor = 'var(--primary)', accentGradient = 'linear-gradient(135deg, var(--primary), var(--primary-dark))', features = ['12,000+ verified coupons', '850+ trusted brands', 'Real-time flash sales', 'Save & organize favorites'], footerLink }: AuthLayoutProps) {
+export default function AuthLayout({
+  title,
+  subtitle,
+  children,
+  icon: Icon,
+  variant = 'user',
+  leftTitle = 'New here?',
+  leftDesc = 'Join us today and discover a world of possibilities. Create your account in seconds!',
+  leftBtnLabel = 'SIGN UP',
+  leftBtnTo = '/register',
+  features,
+}: AuthLayoutProps) {
+  const gradientClass =
+    variant === 'company'
+      ? 'company-gradient'
+      : variant === 'admin'
+        ? 'admin-gradient'
+        : 'user-gradient';
+
+  const badgeClass =
+    variant === 'company'
+      ? 'company-badge'
+      : variant === 'admin'
+        ? 'admin-badge'
+        : 'user-badge';
+
   return (
-    <div style={{ minHeight: '100vh', display: 'flex' }}>
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40 }}>
-        <div style={{ maxWidth: 420, width: '100%' }}>
-          <Link to="/" className="flex items-center gap-8 mb-32">
-            <div className="stat-icon" style={{ width: 38, height: 38, background: accentColor, color: '#fff' }}><Icon size={20} /></div>
-            <span style={{ fontFamily: 'var(--font-head)', fontWeight: 800, fontSize: 22 }}>FlyNow</span>
-          </Link>
-          <h1 style={{ fontSize: 28 }}>{title}</h1>
-          <p className="text-muted mt-8 mb-32">{subtitle}</p>
-          {children}
-          {footerLink && <p className="text-center text-sm text-muted mt-24">{footerLink.label} <Link to={footerLink.to} style={{ color: 'var(--primary-dark)', fontWeight: 600 }}>{footerLink.label.includes('Don') ? 'Sign up' : footerLink.label.includes('Back') ? 'Click here' : ''}</Link></p>}
+    <div className="auth-page">
+      {/* ---------- Left gradient panel ---------- */}
+      <div className={`auth-left ${gradientClass}`}>
+        {/* Decorative shapes */}
+        <div className="auth-decor" />
+        <div className="auth-decor" />
+        <div className="auth-decor" />
+
+        <div className="auth-left-content">
+          {Icon && (
+            <div style={{ marginBottom: 20, opacity: 0.9 }}>
+              <Icon size={48} strokeWidth={1.5} />
+            </div>
+          )}
+          <h2 className="auth-left-title">{leftTitle}</h2>
+          <p className="auth-left-desc">{leftDesc}</p>
+
+          {features && features.length > 0 && (
+            <div className="auth-features">
+              {features.map((f) => (
+                <div key={f} className="auth-feature-item">
+                  <span className="auth-feature-check">
+                    <CheckCircle2 size={14} />
+                  </span>
+                  <span>{f}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {leftBtnTo && (
+            <Link to={leftBtnTo} className="auth-left-btn" style={{ marginTop: features ? 32 : 0 }}>
+              {leftBtnLabel}
+            </Link>
+          )}
         </div>
       </div>
-      <div style={{ flex: 1, background: accentGradient, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40 }} className="hide-mobile">
-        <div style={{ maxWidth: 420, color: '#fff' }}>
-          <h2 style={{ color: '#fff', fontSize: 32, lineHeight: 1.2 }}>The premium way to discover and redeem coupons.</h2>
-          <div className="flex-col gap-16 mt-32">
-            {features.map((t) => (
-              <div key={t} className="flex items-center gap-12"><CheckCircle2 size={20} /> <span style={{ fontSize: 16 }}>{t}</span></div>
-            ))}
-          </div>
+
+      {/* ---------- Right form panel ---------- */}
+      <div className="auth-right">
+        <div className="auth-form-container">
+          {Icon && (
+            <div className={`auth-portal-badge ${badgeClass}`}>
+              <Icon size={14} />
+              {variant === 'company' ? 'Company Portal' : variant === 'admin' ? 'Admin Portal' : 'User Login'}
+            </div>
+          )}
+          <h1 className="auth-form-title">{title}</h1>
+          <p className="auth-form-subtitle">{subtitle}</p>
+          {children}
         </div>
       </div>
     </div>

@@ -28,26 +28,93 @@ export default function CompanyLoginPage() {
   };
 
   return (
-    <AuthLayout title="Company Portal" subtitle="Sign in to manage your flyers and coupons." icon={Building2} accentColor="#5B5FEF" accentGradient="linear-gradient(135deg, #5B5FEF, #4248D4)"
-      features={['Upload unlimited flyers', 'Track coupon performance', 'Real-time analytics dashboard', 'Manage your company profile']}
-      footerLink={{ to: '/register', label: "Don't have a company account?" }}>
-      {params.get('suspended') && <div className="badge badge-danger mb-16" style={{ padding: 12, width: '100%' }}><AlertCircle size={16} /> Your account has been suspended.</div>}
-      <form onSubmit={submit} className="flex-col gap-16">
-        <div className="field">
-          <label className="label">Company Email</label>
-          <div className="flex items-center gap-8"><Mail size={18} style={{ color: 'var(--text-muted)' }} /><input className="input" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="company@example.com" /></div>
+    <AuthLayout
+      title="Sign in"
+      subtitle="Access your company dashboard and manage your campaigns."
+      icon={Building2}
+      variant="company"
+      leftTitle="Grow Your Business"
+      leftDesc="Upload flyers, create coupon campaigns, and track performance — all from one powerful dashboard."
+      leftBtnLabel="SIGN UP"
+      leftBtnTo="/register"
+      features={[
+        'Upload unlimited flyers',
+        'Track coupon performance',
+        'Real-time analytics dashboard',
+        'Manage your company profile',
+      ]}
+    >
+      {params.get('suspended') && (
+        <div className="auth-suspended">
+          <AlertCircle size={16} /> Your company account has been suspended.
         </div>
-        <div className="field">
-          <label className="label">Password</label>
-          <div className="flex items-center gap-8"><Lock size={18} style={{ color: 'var(--text-muted)' }} /><input className="input" type={showPw ? 'text' : 'password'} required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />{password && <button type="button" onClick={() => setShowPw(!showPw)} className="btn-icon">{showPw ? <EyeOff size={16} /> : <Eye size={16} />}</button>}</div>
+      )}
+
+      {error && (
+        <div className="auth-error">
+          <AlertCircle size={16} /> {error}
         </div>
-        {error && <div className="field-error flex items-center gap-8"><AlertCircle size={14} /> {error}</div>}
-        <div className="flex items-center justify-between">
-          <Link to="/forgot-password" className="text-sm" style={{ color: '#5B5FEF' }}>Forgot password?</Link>
+      )}
+
+      <form onSubmit={submit}>
+        <div className="auth-field">
+          <input
+            id="company-email"
+            className="auth-input"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Company Email"
+          />
+          <Mail size={18} className="auth-input-icon" />
         </div>
-        <button className="btn btn-lg w-full" style={{ background: '#5B5FEF', color: '#fff' }} disabled={loading}>{loading ? 'Signing in...' : 'Sign In to Company Portal'}</button>
+
+        <div className="auth-field">
+          <input
+            id="company-password"
+            className="auth-input"
+            type={showPw ? 'text' : 'password'}
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+          />
+          <Lock size={18} className="auth-input-icon" />
+          {password && (
+            <button
+              type="button"
+              onClick={() => setShowPw(!showPw)}
+              className="auth-toggle-pw"
+              aria-label="Toggle password visibility"
+            >
+              {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          )}
+        </div>
+
+        <Link to="/forgot-password" className="auth-forgot">
+          Forgot password?
+        </Link>
+
+        <button
+          id="company-login-btn"
+          className="auth-submit-btn company-btn"
+          type="submit"
+          disabled={loading}
+        >
+          {loading && <span className="btn-spinner" />}
+          {loading ? 'Signing in...' : 'LOGIN'}
+        </button>
       </form>
-      <p className="text-center text-sm text-muted mt-24">Don't have a company account? <Link to="/register" style={{ color: '#5B5FEF', fontWeight: 600 }}>Register</Link></p>
+
+      <div className="auth-footer" style={{ marginTop: 32 }}>
+        <span>Not a business acount? </span>
+        <Link to="/login">User</Link>
+        <span> · </span>
+
+      </div>
     </AuthLayout>
   );
 }
+
