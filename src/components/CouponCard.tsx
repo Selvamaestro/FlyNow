@@ -282,10 +282,10 @@ gap:12
 }}
 >
 
-{coupon.logo_url ? (
+{(coupon.company?.logo_url || coupon.logo_url) ? (
 
 <img
-src={coupon.logo_url}
+src={coupon.company?.logo_url || coupon.logo_url || undefined}
 alt=""
 style={{
 width:46,

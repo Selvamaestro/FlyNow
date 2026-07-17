@@ -103,6 +103,7 @@ export default function WalletPage() {
         }, 0);
     }, [filteredCoupons]);
 
+
     // Expiring Soon
     const expiringSoon = useMemo(() => {
         const today = new Date();
@@ -119,7 +120,6 @@ export default function WalletPage() {
             return diff >= 0 && diff <= 7;
         }).length;
     }, [filteredCoupons]);
-
 
     if (loading) {
         return (
