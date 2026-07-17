@@ -12,6 +12,14 @@ export interface Profile {
   status: ProfileStatus;
   email?: string | null;
   created_at: string;
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+  bio?: string;
+  country?: string;
+  city_state?: string;
+  postal_code?: string;
+  tax_id?: string;
 }
 
 export interface Company {
