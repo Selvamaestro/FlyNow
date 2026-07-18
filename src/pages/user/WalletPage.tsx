@@ -687,22 +687,16 @@ Check it out on FlyNow!
                                     width: "100%",
                                     overflow: "hidden",
                                     borderRadius: 24,
-                                    border: "1px solid #ECECEC",
-                                    background: "#fff",
-                                    transition: ".25s",
+                                    border: "2px dashed #FBBF24",
+                                    background: "#FFFDF7",
+                                    boxShadow: "0 10px 25px rgba(245,158,11,0.12)",
+                                    transition: "all .3s ease",
+cursor: "pointer",
                                 }}
                             >
                                 {/* Flyer */}
 
-                                <img
-                                    src={coupon.flyer_image_url}
-                                    alt={coupon.title}
-                                    style={{
-                                        width: "100%",
-                                        height: 220,
-                                        objectFit: "cover",
-                                    }}
-                                />
+
 
                                 <div
                                     style={{
@@ -765,32 +759,7 @@ Check it out on FlyNow!
 
                                     {/* Price */}
 
-                                    <div
-                                        style={{
-                                            display: "flex",
-                                            gap: 10,
-                                            alignItems: "center",
-                                        }}
-                                    >
-                                        <span
-                                            style={{
-                                                fontWeight: 800,
-                                                color: "var(--primary)",
-                                                fontSize: 20,
-                                            }}
-                                        >
-                                            ₹{coupon.discount_price}
-                                        </span>
 
-                                        <span
-                                            style={{
-                                                textDecoration: "line-through",
-                                                color: "#888",
-                                            }}
-                                        >
-                                            ₹{coupon.retail_price}
-                                        </span>
-                                    </div>
 
                                     <div
                                         style={{
@@ -905,16 +874,7 @@ Check it out on FlyNow!
                                                 Share
                                             </button>
 
-                                            <button
-                                                className="btn btn-secondary"
-                                                onClick={() =>
-                                                    navigator.clipboard.writeText(
-                                                        coupon.coupon_code
-                                                    )
-                                                }
-                                            >
-                                                Copy
-                                            </button>
+
 
                                             <button
                                                 className="btn btn-secondary"
