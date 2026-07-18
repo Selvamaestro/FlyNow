@@ -12,6 +12,14 @@ export interface Profile {
   status: ProfileStatus;
   email?: string | null;
   created_at: string;
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+  bio?: string;
+  country?: string;
+  city_state?: string;
+  postal_code?: string;
+  tax_id?: string;
 }
 
 export interface Company {
@@ -66,7 +74,11 @@ export interface SavedCoupon {
   user_id: string;
   coupon_id: string;
   created_at: string;
-  coupon?: Coupon;
+
+  redeemed: boolean;
+  redeemed_at?: string | null;
+
+  coupon: Coupon;
 }
 
 export interface NotificationItem {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, AlertCircle, Shield } from 'lucide-react';
 import AuthLayout from './AuthLayout';
 import { useAuth } from '../../lib/auth-context';
@@ -28,23 +28,83 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <AuthLayout title="Admin Portal" subtitle="Restricted access. Administrators only." icon={Shield} accentColor="#E4A817" accentGradient="linear-gradient(135deg, #E4A817, #D89B17)"
-      features={['Full platform management', 'Review and approve coupons', 'Manage companies and users', 'Analytics and revenue reports']}
-      footerLink={{ to: '/login', label: 'Not an admin? Back to' }}>
-      {params.get('suspended') && <div className="badge badge-danger mb-16" style={{ padding: 12, width: '100%' }}><AlertCircle size={16} /> Your account has been suspended.</div>}
-      <form onSubmit={submit} className="flex-col gap-16">
-        <div className="field">
-          <label className="label">Admin Email</label>
-          <div className="flex items-center gap-8"><Mail size={18} style={{ color: 'var(--text-muted)' }} /><input className="input" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@flynow.com" /></div>
+    <AuthLayout
+      title="Sign in"
+      subtitle="Restricted access. Administrators only."
+      icon={Shield}
+      variant="admin"
+      leftTitle="Admin Portal"
+      leftDesc="Full platform control at your fingertips. Manage users, companies, analytics and more."
+      leftBtnLabel=""
+      leftBtnTo=""
+      features={[
+        'Full platform management',
+        'Review and approve coupons',
+        'Manage companies and users',
+        'Analytics and revenue reports',
+      ]}
+    >
+      {params.get('suspended') && (
+        <div className="auth-suspended">
+          <AlertCircle size={16} /> Your account has been suspended.
         </div>
-        <div className="field">
-          <label className="label">Password</label>
-          <div className="flex items-center gap-8"><Lock size={18} style={{ color: 'var(--text-muted)' }} /><input className="input" type={showPw ? 'text' : 'password'} required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />{password && <button type="button" onClick={() => setShowPw(!showPw)} className="btn-icon">{showPw ? <EyeOff size={16} /> : <Eye size={16} />}</button>}</div>
+      )}
+
+      {error && (
+        <div className="auth-error">
+          <AlertCircle size={16} /> {error}
         </div>
-        {error && <div className="field-error flex items-center gap-8"><AlertCircle size={14} /> {error}</div>}
-        <button className="btn btn-lg w-full" style={{ background: 'linear-gradient(135deg, #E4A817, #D89B17)', color: '#fff', border: 'none' }} disabled={loading}>{loading ? 'Signing in...' : 'Sign In to Admin Portal'}</button>
+      )}
+
+      <form onSubmit={submit}>
+        <div className="auth-field">
+          <input
+            id="admin-email"
+            className="auth-input"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Admin Email"
+          />
+          <Mail size={18} className="auth-input-icon" />
+        </div>
+
+        <div className="auth-field">
+          <input
+            id="admin-password"
+            className="auth-input"
+            type={showPw ? 'text' : 'password'}
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+          />
+          <Lock size={18} className="auth-input-icon" />
+          {password && (
+            <button
+              type="button"
+              onClick={() => setShowPw(!showPw)}
+              className="auth-toggle-pw"
+              aria-label="Toggle password visibility"
+            >
+              {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          )}
+        </div>
+
+        <button
+          id="admin-login-btn"
+          className="auth-submit-btn admin-btn"
+          type="submit"
+          disabled={loading}
+        >
+          {loading && <span className="btn-spinner" />}
+          {loading ? 'Signing in...' : 'LOGIN'}
+        </button>
       </form>
-      <p className="text-center text-sm text-muted mt-24">Not an admin? <Link to="/login" style={{ color: 'var(--primary-dark)', fontWeight: 600 }}>User login</Link> · <Link to="/company/login" style={{ color: '#E4A817', fontWeight: 600 }}>Company login</Link></p>
+
+
     </AuthLayout>
   );
 }

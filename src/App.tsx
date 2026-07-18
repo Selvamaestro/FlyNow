@@ -10,6 +10,7 @@ import CategoriesPage from './pages/user/CategoriesPage';
 import CategoryPage from './pages/user/CategoryPage';
 import CouponDetailPage from './pages/user/CouponDetailPage';
 import SavedCouponsPage from './pages/user/SavedCouponsPage';
+import WalletPage from './pages/user/WalletPage';
 import ProfilePage from './pages/user/ProfilePage';
 import NotificationsPage from './pages/user/NotificationsPage';
 import AboutPage from './pages/user/AboutPage';
@@ -62,7 +63,17 @@ export default function App() {
             <Route path="/contact" element={<PublicLayout><ContactPage /></PublicLayout>} />
 
             {/* User protected */}
-            <Route path="/saved" element={<ProtectedRoute roles={['user','company','admin']}><PublicLayout><SavedCouponsPage /></PublicLayout></ProtectedRoute>} />
+            <Route path="/saved" element={<ProtectedRoute roles={['user', 'company', 'admin']}><PublicLayout><SavedCouponsPage /></PublicLayout></ProtectedRoute>} />
+            <Route
+              path="/wallet"
+              element={
+                <ProtectedRoute roles={['user', 'company', 'admin']}>
+                  <PublicLayout>
+                    <WalletPage />
+                  </PublicLayout>
+                </ProtectedRoute>
+              }
+            />
             <Route path="/profile" element={<ProtectedRoute><PublicLayout><ProfilePage /></PublicLayout></ProtectedRoute>} />
             <Route path="/notifications" element={<ProtectedRoute><PublicLayout><NotificationsPage /></PublicLayout></ProtectedRoute>} />
 

@@ -1,0 +1,127 @@
+.offerFloat {
+  position: absolute;
+  padding: 14px 18px;
+  border-radius: 16px;
+  font-weight: 700;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, .15);
+  animation: floatCard 3s ease-in-out infinite;
+}
+/* ===========================
+   UNIVERSAL CARD HOVER
+=========================== */
+
+.premium-card{
+    transition:all .35s ease;
+    border:2px solid transparent;
+}
+
+.premium-card:hover{
+    transform:translateY(-12px) scale(1.02);
+    border-color:#E4A817;
+    box-shadow:
+        0 25px 60px rgba(228,168,23,.20),
+        0 12px 30px rgba(0,0,0,.08);
+}
+
+/* ===========================
+   IMAGE
+=========================== */
+
+.premium-image{
+    transition:transform .45s ease;
+}
+
+.premium-card:hover .premium-image{
+    transform:scale(1.08);
+}
+
+/* ===========================
+   BADGE
+=========================== */
+
+.offer-badge{
+    transition:.35s;
+}
+
+.premium-card:hover .offer-badge{
+    transform:scale(1.1);
+}
+
+/* ===========================
+   BUTTON
+=========================== */
+
+.offer-btn{
+    transition:.3s;
+}
+
+.premium-card:hover .offer-btn{
+    background:#C98D00 !important;
+    transform:translateY(-2px);
+}
+
+/* ===========================
+   TITLE
+=========================== */
+
+.offer-title{
+    transition:.3s;
+}
+
+.premium-card:hover .offer-title{
+    color:#D89B17;
+}
+
+/* ===========================
+   SHINE EFFECT
+=========================== */
+
+.premium-card{
+    position:relative;
+    overflow:hidden;
+}
+
+.premium-card::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:-120%;
+    width:70%;
+    height:100%;
+    background:
+        linear-gradient(
+            120deg,
+            transparent,
+            rgba(255,255,255,.55),
+            transparent
+        );
+    transition:.8s;
+}
+
+.premium-card:hover::before{
+    left:140%;
+}
+
+@keyframes floatGift {
+  0% {
+    transform: translate(-50%, -50%) translateY(0);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(-18px);
+  }
+  100% {
+    transform: translate(-50%, -50%) translateY(0);
+  }
+}
+
+@keyframes floatCard {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
