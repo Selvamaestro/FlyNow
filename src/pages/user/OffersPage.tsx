@@ -5,12 +5,13 @@ import EmptyState from '../../components/EmptyState';
 import { PageLoader } from '../../components/Spinner';
 import { useEffect, useMemo, useRef, useState } from "react";
 import Confetti from "react-confetti";
+import "./OffersPage.css";
 import ScratchCard from "lesca-react-scratch-card";
 import { supabase } from "../../lib/supabase";
-import { 
-  Flame, Zap, ShieldCheck, Coins, Clock, Star, Gift, 
-  Ticket, Calendar, Users, Copy, Share2, Sparkles, 
-  CheckCircle 
+import {
+  Flame, Zap, ShieldCheck, Coins, Clock, Star, Gift,
+  Ticket, Calendar, Users, Copy, Share2, Sparkles,
+  CheckCircle
 } from 'lucide-react';
 
 export default function OffersPage() {
@@ -25,7 +26,7 @@ export default function OffersPage() {
   const [cat] = useState('all');
   const [sort] = useState('newest');
   const { data: coupons, loading } = useAsync(() => couponService.listApproved(), []);
-
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const filtered = useMemo(() => {
     let list = coupons ?? [];
     if (q) list = list.filter((c) => (c.title + c.description + (c.company?.name ?? '')).toLowerCase().includes(q.toLowerCase()));
@@ -353,12 +354,18 @@ https://flynow.com`;
     <div className="container" style={{ padding: '40px 24px' }}>
       {/* Hero Banner */}
 
+
       <div
         style={{
           background:
-            "linear-gradient(135deg,#F6B61E 0%,#FFD54F 50%,#FFEAA7 100%)",
+            `
+radial-gradient(circle at top left,#FFEFA8 0%,transparent 28%),
+radial-gradient(circle at bottom right,#FFD45E 0%,transparent 30%),
+linear-gradient(135deg,#E4A817 0%,#F5C93C 55%,#FFE68B 100%)
+`,
           borderRadius: 28,
-          padding: "60px",
+          padding: "70px 70px",
+          minHeight: 520,
           color: "#222",
           display: "grid",
           gridTemplateColumns: "1.2fr 0.8fr",
@@ -368,6 +375,53 @@ https://flynow.com`;
           position: "relative",
         }}
       >
+        <div
+          style={{
+            position: "absolute",
+            top: 30,
+            left: 80,
+            fontSize: 26,
+            opacity: .6
+          }}
+        >
+          ✨
+        </div>
+
+        <div
+          style={{
+            position: "absolute",
+            top: 120,
+            right: 100,
+            fontSize: 22,
+            opacity: .5
+          }}
+        >
+          ⭐
+        </div>
+
+        <div
+          style={{
+            position: "absolute",
+            bottom: 40,
+            left: 280,
+            fontSize: 30,
+            opacity: .6
+          }}
+        >
+          💰
+        </div>
+
+        <div
+          style={{
+            position: "absolute",
+            bottom: 90,
+            right: 220,
+            fontSize: 28,
+            opacity: .5
+          }}
+        >
+          🏷️
+        </div>
         <div>
           <div
             style={{
@@ -409,6 +463,42 @@ https://flynow.com`;
             Sports and hundreds of premium brands.
             Every coupon is verified and ready to redeem.
           </p>
+          <div
+            style={{
+              display: "flex",
+              gap: 16,
+              marginTop: 28,
+              marginBottom: 35
+            }}
+          >
+            <button
+              style={{
+                background: "#222",
+                color: "#fff",
+                padding: "16px 34px",
+                borderRadius: 14,
+                border: "none",
+                fontWeight: 700,
+                cursor: "pointer",
+              }}
+            >
+              🔥 Today's Deals
+            </button>
+
+            <button
+              style={{
+                background: "#fff",
+                color: "#222",
+                padding: "16px 34px",
+                borderRadius: 14,
+                border: "2px solid rgba(0,0,0,.08)",
+                fontWeight: 700,
+                cursor: "pointer",
+              }}
+            >
+              🎁 Exclusive Coupons
+            </button>
+          </div>
 
           <div
             style={{
@@ -444,17 +534,79 @@ https://flynow.com`;
 
         <div
           style={{
-            textAlign: "center",
+            position: "relative",
+            height: 420,
           }}
         >
-          <img
-            src="/images/image.png"
-            alt="Offers"
+
+          {/* Main Gift */}
+
+          <div
             style={{
-              width: "100%",
-              maxWidth: 420,
+              position: "absolute",
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%,-50%)",
+              fontSize: 220,
+              animation: "floatGift 4s ease-in-out infinite",
+              zIndex: 3,
             }}
-          />
+          >
+            🎁
+          </div>
+
+          {/* Coupon */}
+
+          <div
+            className="offerFloat"
+            style={{
+              top: 10,
+              left: 10,
+              background: "#fff",
+            }}
+          >
+            🏷️ 70% OFF
+          </div>
+
+          {/* Cashback */}
+
+          <div
+            className="offerFloat"
+            style={{
+              top: 40,
+              right: 0,
+              background: "#fff",
+            }}
+          >
+            💰 Cashback
+          </div>
+
+          {/* Gift */}
+
+          <div
+            className="offerFloat"
+            style={{
+              bottom: 30,
+              left: 0,
+              background: "#fff",
+            }}
+          >
+            🎉 Rewards
+          </div>
+
+          {/* Coupon */}
+
+          <div
+            className="offerFloat"
+            style={{
+              bottom: 20,
+              right: 20,
+              background: "#fff",
+            }}
+          >
+            🎫 Coupons
+          </div>
+
         </div>
       </div>
 
@@ -554,40 +706,75 @@ https://flynow.com`;
           {filtered.slice(0, 4).map((coupon) => (
 
             <div
+            className="premium-card"
               key={coupon.id}
+              onMouseEnter={() => setHoveredCard(coupon.id)}
+              onMouseLeave={() => setHoveredCard(null)}
               onClick={() => navigate(`/coupons/${coupon.id}`)}
               style={{
                 background: "#fff",
                 borderRadius: 22,
                 overflow: "hidden",
                 cursor: "pointer",
-                boxShadow: "0 12px 28px rgba(0,0,0,.08)",
-                transition: ".3s",
+
+                transform:
+                  hoveredCard === coupon.id
+                    ? "translateY(-12px) scale(1.03)"
+                    : "translateY(0) scale(1)",
+
+                boxShadow:
+                  hoveredCard === coupon.id
+                    ? "0 28px 60px rgba(228,168,23,.25)"
+                    : "0 12px 28px rgba(0,0,0,.08)",
+
+                border:
+                  hoveredCard === coupon.id
+                    ? "2px solid #E4A817"
+                    : "2px solid transparent",
+
+                transition: "all .35s ease",
               }}
             >
 
               <div style={{ position: "relative" }}>
 
                 <img
+                  className="premium-image"
                   src={coupon.flyer_image_url}
                   alt={coupon.title}
                   style={{
                     width: "100%",
                     height: 220,
                     objectFit: "cover",
+
+                    transform:
+                      hoveredCard === coupon.id
+                        ? "scale(1.08)"
+                        : "scale(1)",
+
+                    transition: ".4s",
                   }}
                 />
 
                 <div
+                className="offer-badge"
                   style={{
                     position: "absolute",
                     top: 15,
                     left: 15,
+
                     background: "#F4B400",
                     color: "#fff",
                     padding: "8px 16px",
                     borderRadius: 30,
                     fontWeight: 700,
+
+                    transform:
+                      hoveredCard === coupon.id
+                        ? "scale(1.1)"
+                        : "scale(1)",
+
+                    transition: ".3s",
                   }}
                 >
                   {coupon.discount}
@@ -620,6 +807,7 @@ https://flynow.com`;
                 </div>
 
                 <h3
+                className="offer-title"
                   style={{
                     fontSize: 20,
                     marginBottom: 10,
@@ -640,16 +828,29 @@ https://flynow.com`;
                 </p>
 
                 <button
+                className="offer-btn"
                   style={{
                     width: "100%",
                     marginTop: 18,
-                    background: "#E4A817",
+
+                    background:
+                      hoveredCard === coupon.id
+                        ? "#C98D00"
+                        : "#E4A817",
+
                     color: "#fff",
                     border: "none",
                     padding: "13px",
                     borderRadius: 12,
                     cursor: "pointer",
                     fontWeight: 700,
+
+                    transform:
+                      hoveredCard === coupon.id
+                        ? "translateY(-2px)"
+                        : "translateY(0)",
+
+                    transition: ".3s",
                   }}
                 >
                   Save Coupon
@@ -762,6 +963,7 @@ https://flynow.com`;
             return (
 
               <div
+              className="premium-card"
                 key={deal.title}
                 style={{
                   background: deal.color,
@@ -775,6 +977,7 @@ https://flynow.com`;
               >
 
                 <img
+                className="premium-image"
                   src={deal.image}
                   alt={deal.title}
                   style={{
@@ -807,6 +1010,7 @@ https://flynow.com`;
                   </div>
 
                   <h3
+                  className="offer-title"
                     style={{
                       fontSize: 26,
                       marginBottom: 10,
@@ -836,6 +1040,7 @@ https://flynow.com`;
                   </p>
 
                   <button
+                  className="offer-btn"
                     onClick={() => {
                       if (coupon) {
                         navigate(`/coupons/${coupon.id}`);
@@ -954,6 +1159,7 @@ https://flynow.com`;
           ].map((item) => (
 
             <div
+            className="premium-card"
               key={item.title}
               style={{
                 background: item.bg,
@@ -967,6 +1173,7 @@ https://flynow.com`;
             >
 
               <img
+               className="premium-image"
                 src={item.image}
                 alt={item.title}
                 style={{
@@ -999,6 +1206,7 @@ https://flynow.com`;
                 </div>
 
                 <h3
+                className="offer-title"
                   style={{
                     fontSize: 24,
                     marginBottom: 10,
@@ -1019,6 +1227,7 @@ https://flynow.com`;
                 </div>
 
                 <button
+                className="offer-btn"
                   style={{
                     background: "#E4A817",
                     color: "#fff",

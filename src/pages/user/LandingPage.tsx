@@ -29,21 +29,88 @@ function FlashCountdown({ createdAt }: { createdAt: string }) {
 
     return () => clearInterval(timer);
   }, [createdAt]);
+  
 
   return <span>{timeLeft}</span>;
 }
 
 export default function LandingPage() {
   const navigate = useNavigate();
-  const [query, setQuery] = useState('');
-  const [activeRoadmapTab, setActiveRoadmapTab] = useState<'shoppers' | 'businesses'>('shoppers');
+const [query, setQuery] = useState("");
+const [placeholder, setPlaceholder] = useState("Search Nike offers..."); 
+const placeholders = [
+  "Search Nike offers...",
+  "Search Samsung deals...",
+  "Search Grocery coupons...",
+  "Search Fashion discounts...",
+  "Search Furniture offers...",
+  "Search Electronics...",
+];
+const [stats, setStats] = useState({
+  coupons: 0,
+  brands: 0,
+  users: 0,
+  satisfaction: 0,
+});
+
+ const [activeRoadmapTab, setActiveRoadmapTab] = useState<'shoppers' | 'businesses'>('shoppers');
   const { data: coupons, loading } = useAsync(() => couponService.listApproved(), []);
   const { data: categories } = useAsync(() => categoryService.list(), []);
+  useEffect(() => {
+  let index = 0;
+
+  const interval = setInterval(() => {
+    index = (index + 1) % placeholders.length;
+    setPlaceholder(placeholders[index]);
+  }, 2500);
+
+  return () => clearInterval(interval);
+}, []);
+useEffect(() => {
+  let coupons = 0;
+  let brands = 0;
+  let users = 0;
+  let satisfaction = 0;
+
+  const timer = setInterval(() => {
+    coupons = Math.min(coupons + 250, 12000);
+    brands = Math.min(brands + 20, 850);
+    users = Math.min(users + 50000, 2400000);
+    satisfaction = Math.min(satisfaction + 2, 98);
+
+    setStats({
+      coupons,
+      brands,
+      users,
+      satisfaction,
+    });
+
+    if (
+      coupons === 12000 &&
+      brands === 850 &&
+      users === 2400000 &&
+      satisfaction === 98
+    ) {
+      clearInterval(timer);
+    }
+  }, 30);
+
+  return () => clearInterval(timer);
+}, []);
 
   const featured = (coupons ?? []).slice(0, 8);
   const flash = (coupons ?? []).filter((c) => c.is_flash === true).slice(0, 4);
 
-  const search = () => navigate(`/offers?q=${encodeURIComponent(query)}`);
+const search = () => {
+  const value = query.trim();
+
+  if (!value) {
+    navigate("/offers");
+    return;
+  }
+
+  navigate(`/offers?q=${encodeURIComponent(value)}`);
+};
 const flashDeals = [
   {
     id: 1,
@@ -143,6 +210,8 @@ const exclusiveCoupons = [
           alignItems: "center",
           gap: "8px",
           background: "#FFF4D8",
+          boxShadow:"0 8px 25px rgba(228,168,23,.25)",
+animation:"pulseGlow 3s infinite",
           color: "#D89B17",
           padding: "8px 18px",
           borderRadius: "30px",
@@ -198,7 +267,7 @@ const exclusiveCoupons = [
       >
         <input
           type="text"
-          placeholder="Search brands, categories or offers..."
+          placeholder={placeholder}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && search()}
@@ -214,7 +283,14 @@ const exclusiveCoupons = [
         <button
           onClick={search}
           style={{
-            background: "#E4A817",
+            background:
+"linear-gradient(90deg,#E4A817,#FFD54F,#E4A817)",
+
+backgroundSize:"250%",
+
+animation:"shine 3s linear infinite",
+            transition: "all .3s ease",
+boxShadow: "0 10px 25px rgba(228,168,23,.35)",
             color: "#fff",
             border: "none",
             width: "170px",
@@ -237,18 +313,24 @@ const exclusiveCoupons = [
         }}
       >
         {[
-          ["12k+", "Active Coupons"],
-          ["850+", "Top Brands"],
-          ["2.4M", "Happy Users"],
-          ["98%", "Satisfaction"],
-        ].map(([num, text]) => (
-          <div key={num}>
+  [`${Math.floor(stats.coupons / 1000)}k+`, "Active Coupons"],
+  [`${stats.brands}+`, "Top Brands"],
+  [`${(stats.users / 1000000).toFixed(1)}M`, "Happy Users"],
+  [`${stats.satisfaction}%`, "Satisfaction"],
+].map(([num, text]) => (
+          <div key={num}
+          style={{
+  transition: "all .3s ease",
+  cursor: "default",
+}}
+          >
             <h2
               style={{
                 color: "#D89B17",
                 fontSize: "42px",
                 marginBottom: "5px",
                 fontWeight: 800,
+                textShadow: "0 4px 15px rgba(228,168,23,.25)",
               }}
             >
               {num}
@@ -258,6 +340,7 @@ const exclusiveCoupons = [
               style={{
                 color: "#666",
                 fontSize: "15px",
+                fontWeight: 500,
               }}
             >
               {text}
@@ -275,11 +358,44 @@ const exclusiveCoupons = [
       }}
     >
       <div
+  style={{
+    position: "absolute",
+    top: 40,
+    left: -40,
+    background: "#fff",
+    padding: "16px 20px",
+    borderRadius: 18,
+    boxShadow: "0 15px 40px rgba(0,0,0,.12)",
+    zIndex: 5,
+    animation: "floatCard 3.5s ease-in-out infinite",
+  }}
+>
+  <div
+    style={{
+      color: "#D89B17",
+      fontWeight: 800,
+      fontSize: 24,
+    }}
+  >
+    70% OFF
+  </div>
+
+  <div
+    style={{
+      color: "#666",
+      fontSize: 14,
+    }}
+  >
+    Electronics
+  </div>
+</div>
+      <div
         style={{
           position: "absolute",
           width: "520px",
           height: "520px",
           borderRadius: "50%",
+          animation: "pulseGlow 4s infinite",
           background:
             "radial-gradient(circle,#FFD768 0%,rgba(255,215,104,.15) 70%,transparent 100%)",
           filter: "blur(15px)",
@@ -289,11 +405,43 @@ const exclusiveCoupons = [
           zIndex: 0,
         }}
       />
+<div
+  style={{
+    position: "absolute",
+    right: -20,
+    bottom: 60,
+    background: "#fff",
+    padding: "16px 22px",
+    borderRadius: 18,
+    boxShadow: "0 15px 40px rgba(0,0,0,.12)",
+    zIndex: 5,
+    animation: "floatCard 4s ease-in-out infinite",
+  }}
+>
+  <div
+    style={{
+      fontSize: 24,
+      fontWeight: 800,
+      color: "#16A34A",
+    }}
+  >
+    ₹250
+  </div>
 
+  <div
+    style={{
+      color: "#666",
+      fontSize: 14,
+    }}
+  >
+    Cashback
+  </div>
+</div>
       <img
         src="/images/image.png"
         alt="Hero"
         style={{
+          animation: "floatImage 4s ease-in-out infinite",
          width:"650px",
          maxWidth:"100%",
          display:"block",
@@ -360,7 +508,7 @@ const exclusiveCoupons = [
           }}
         >
           <div
-            className="category-card"
+            className="category-card card-hover"
             style={{
               background: "#fff",
               borderRadius: 24,
@@ -483,6 +631,7 @@ const exclusiveCoupons = [
       {featured.slice(0,4).map((coupon) => (
         <div
           key={coupon.id}
+          className="card-hover"
           onClick={() => navigate(`/coupons/${coupon.id}`)}
           style={{
             background: "#fff",
@@ -575,6 +724,7 @@ const exclusiveCoupons = [
                 border: "none",
                 borderRadius: 14,
                 background: "#E4A817",
+                transition:"all .3s ease",
                 color: "#fff",
                 fontWeight: 700,
                 cursor: "pointer",
@@ -653,6 +803,7 @@ const exclusiveCoupons = [
             return (
                 <div
                     key={deal.id}
+                    className="card-hover"
                     onClick={() => isDbCoupon && navigate(`/coupons/${deal.id}`)}
                     style={{
                         background: "#fff",
@@ -755,6 +906,7 @@ const exclusiveCoupons = [
                             style={{
                                 width: "100%",
                                 background: "#E4A817",
+                                transition:"all .3s ease",
                                 color: "#fff",
                                 borderRadius: 14,
                                 border: "none",
@@ -839,6 +991,7 @@ const exclusiveCoupons = [
 
             <div
                 key={coupon.id}
+                className="card-hover"
                 style={{
                     background: "#fff",
                     borderRadius: 22,
@@ -909,6 +1062,7 @@ const exclusiveCoupons = [
                         style={{
                             width: "100%",
                             background: "#E4A817",
+                            transition:"all .3s ease",
                             color: "#fff",
                             border: "none",
                             borderRadius: 14,
@@ -1133,6 +1287,80 @@ const exclusiveCoupons = [
         </div>
 
         <style>{`
+        @keyframes floatImage {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-18px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes floatCard {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes pulseGlow {
+  0% {
+    transform: scale(1);
+    opacity: .6;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: .6;
+  }
+}
+
+@keyframes shine {
+  0% {
+    background-position: -250px;
+  }
+
+  100% {
+    background-position: 250px;
+  }
+}
+  .card-hover{
+    transition:all .35s ease;
+    border:2px solid transparent;
+}
+
+.card-hover:hover{
+    transform:translateY(-12px);
+    box-shadow:0 30px 60px rgba(0,0,0,.18);
+    border-color:#E4A817;
+}
+
+.card-hover img{
+    transition:transform .45s ease;
+}
+
+.card-hover:hover img{
+    transform:scale(1.08);
+}
+
+.card-hover button{
+    transition:.3s;
+}
+
+.card-hover:hover button{
+    background:#c88f0f !important;
+}
           @media (max-width: 768px) {
             .grid-roadmap {
               grid-template-columns: 1fr !important;
